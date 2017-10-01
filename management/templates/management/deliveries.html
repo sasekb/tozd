@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block head_title %}Vsa naročila || {{ block.super }}{% endblock head_title %}
+
+
+
+{% block content %}
+    <form method="get" action="{% url 'deliveries' %}">
+        Pokaži sprocesirane: <input type="checkbox" name="show_delivered" value="1" {% if show_processed %}checked{% endif %}>  
+        <p><input type="submit" name="submit" value="submit"/></p>
+    </form>
+
+    <table>
+        <tr>
+            <td><a href="?orderby=user">Username</a></td>
+            <td><a href="?orderby=quantity">Količina</a></td>
+            <td>Opombe</td>
+            <td>Datum</td>
+            <td>Distributer</td>
+            <td>Zabeleži dostavo</td>
+        </tr>
+        {% for package in object_list %}
+            <tr>
+                <td>{{ package.order.user.username }}</td>
+                <td>{{ package.order.quantity }}</td>
+                <td>{{ package.distribution_notes }}</td>
+                <td>{{ package.created|date }}</td>
+                <td>{{ package.assign_to }}</td>
+                <td><a href="{% url 'deliver' package=package.id %}">dostavljeno</a></td>
+            </tr>
+        {% empty %}
+            <p>No deliveries yet.</p>
+        {% endfor %}
+    </table>
+
+{% endblock  %}

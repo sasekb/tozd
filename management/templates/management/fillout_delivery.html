@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block head_title %}Sprovedi naročilo || {{ block.super }}{% endblock head_title %}
+
+
+
+{% block content %}
+<form action="" method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Sprovedi" />
+</form>
+{% endblock  %}

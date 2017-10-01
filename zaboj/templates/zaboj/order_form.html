@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block head_title %}Oddaj naročilo || {{ block.super }}{% endblock head_title %}
+
+
+
+{% block content %}
+<h1>Oddaj naročilo</h1>
+
+<form action="" method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Oddaj naročilo" />
+</form>
+
+<!--{##% include 'snippets/sidebar.html' %}-->
+
+{% endblock  %}
