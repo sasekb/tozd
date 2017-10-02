@@ -3,6 +3,12 @@ Adim for the users app
 """
 from django.contrib import admin
 from .models import User, Distributer
+from zaboj.models import Order
+
+class OrdersInline(admin.TabularInline):
+    """ Shows orders on user's admin page """
+    model = Order
+    classes = ['collapse']
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
@@ -44,7 +50,11 @@ class UserAdmin(admin.ModelAdmin):
             'fields': ('is_union_member',)
         })
     )
+    radio_fields = {'pickup_method': admin.HORIZONTAL}
     filter_horizontal = ['likes', 'dislikes']
+    inlines = [OrdersInline]
+    save_on_top = True
+    save_as = True
 
 @admin.register(Distributer)
 class DistributerAdmin(admin.ModelAdmin):

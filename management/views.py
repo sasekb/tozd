@@ -4,7 +4,7 @@ Views for order management.
 from datetime import datetime, timedelta
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import get_object_or_404
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 from tozd.settings import PRICE_ZABOJ
 from users.models import Distributer
@@ -33,15 +33,20 @@ class OrdersList(PermissionRequiredMixin, ListView):
         """ Additional context. """
         context = super(OrdersList, self).get_context_data(**kwargs)
         context['show_processed'] = self.request.GET.get('show_processed', False)
+        if context['show_processed']:
+            context['zaboj_productions'] = ZabojProduction.objects.values_list('id', flat=True)
         return context
 
 class ProcessOrder(CreateView):
-    """
-    Fill out production details
-    """
+    """ Fill out production details """
     model = ZabojProduction
     template_name = 'management/fillout_order.html'
     fields = ['crate', 'distribution_notes', 'enduser_notes', 'assign_to', 'price']
+
+    def get_form(self):
+        form = super(ProcessOrder, self).get_form()
+        form.fields['crate'].queryset = Crate.objects.filter(at_user=None).filter(at_distributer=None).filter(in_repairs=False)
+        return form
 
     def get_initial(self):
         order = get_object_or_404(Order, id=self.kwargs.get('order'))
@@ -59,6 +64,30 @@ class ProcessOrder(CreateView):
         form.instance.order = get_object_or_404(Order, id=self.kwargs.get('order'))
         form.instance.prepared_by = self.request.user
         return super(ProcessOrder, self).form_valid(form)
+
+class UpdateProcessOrder(UpdateView):
+    """ Update production details """
+    model = ZabojProduction
+    template_name = 'management/fillout_order.html'
+    fields = ['crate', 'distribution_notes', 'enduser_notes', 'assign_to', 'price']
+
+    def get_form(self):
+        
+        form = super(UpdateProcessOrder, self).get_form()
+        form.fields['crate'].queryset = Crate.objects.filter(at_user=None).filter(at_distributer=None).filter(in_repairs=False) | Crate.objects.filter(id=self.object.crate.id)
+        return form
+
+    def get_object(self):
+        return get_object_or_404(ZabojProduction, order__id=self.kwargs.get('order'))
+
+    def form_valid(self, form):
+        # move crate to the distributer
+        crate = get_object_or_404(Crate, id=form.instance.crate.id)
+        crate.at_distributer = form.instance.assign_to
+        crate.save()
+        form.instance.order = get_object_or_404(Order, id=self.kwargs.get('order'))
+        form.instance.prepared_by = self.request.user
+        return super(UpdateProcessOrder, self).form_valid(form)
 
 class DeliveriesDistributerList(PermissionRequiredMixin, ListView):
     """

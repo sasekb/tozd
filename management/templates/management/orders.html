@@ -15,6 +15,7 @@ $( function() {
   });
 } );
 </script>
+
 <form method="get" action="{% url 'orders' %}">
         Pokaži sprocesirane: <input type="checkbox" name="show_processed" value="1" {% if show_processed %}checked{% endif %}>  
         <p><input type="submit" name="submit" value="submit"/></p>
@@ -34,7 +35,11 @@ $( function() {
             <td>{{ order.quantity }}</td>
             <td>{{ order.notes }}</td>
             <td>{{ order.created|date }}</td>
+            {% if order.id in zaboj_productions %}
+            <td><a href="{% url 'update_process' order=order.id %}">uredi</a></td>
+            {% else %}
             <td><a href="{% url 'process' order=order.id %}">sprocesiraj</a></td>
+            {% endif %}
         </tr>
     {% empty %}
         <p>No orders yet.</p>

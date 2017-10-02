@@ -24,7 +24,7 @@ class Vegetable(models.Model):
 
 class Order(models.Model):
     """ Model for orders. """
-    choices = [(0.5, '0,5 kg') if i == 0 else (i, str(i) + ' kg') for i in range(0, 11)]
+    choices = [(0.5, '0,5 kg') if i == 0 else (float(i), str(i) + ' kg') for i in range(0, 11)]
 
     user = models.ForeignKey(User)
     quantity = models.FloatField(choices=choices)
