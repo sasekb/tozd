@@ -7,9 +7,9 @@
 {% block content %}
 <h1>Oddaj naročilo</h1>
 
-<form action="" method="post">{% csrf_token %}
+<form action="" method="post" class="form-horizontal">{% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="Oddaj naročilo" />
+    <input type="submit" value="Oddaj naročilo" class="form-control col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 btn btn-outline-primary" />
 </form>
 
 <!--{##% include 'snippets/sidebar.html' %}-->

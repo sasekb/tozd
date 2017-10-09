@@ -3,10 +3,10 @@
 
 <head>
 <title>{% block head_title %}NDP TOZD{% endblock head_title %}</title>
-<!--{#% include 'snippets/css.html' % #}-->
+{% include 'snippets/css.html' %}
 </head>
 <body>
-<!--{#% include 'snippets/nav.html' %#}-->
+{% include 'snippets/nav.html' %}
 
 <div class='container'>
 {% block content %}
@@ -14,6 +14,6 @@
 </div>
 
 
-<!--{##% include 'snippets/js.html' %}-->
+{% include 'snippets/js.html' %}
 </body>
 </html>

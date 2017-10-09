@@ -71,10 +71,8 @@ class UserEdit(LoginRequiredMixin, UpdateView):
     template_name_suffix = '_update_form'
 
     def get_object(self):
-        """
-        get object from model class
-        """
-        return get_object_or_404(User, username__iexact=self.request.user, is_active=True)
+        """ get object from model class """
+        return get_object_or_404(User, id__iexact=self.request.user.id)
 
 
 def signup(request):
@@ -96,13 +94,12 @@ def signup(request):
 
 
 
-class EditPreferences(UpdateView):
+class EditPreferences(LoginRequiredMixin, UpdateView):
+    """ edit user data """
     model = User
     form_class = UserPreferenceForm
     template_name_suffix = '_preference_form'
 
     def get_object(self):
-        """
-        get object from model class
-        """
-        return get_object_or_404(User, username__iexact=self.request.user.username, is_active=True)
+        """ get object from model class """
+        return get_object_or_404(User, id__iexact=self.request.user.id)

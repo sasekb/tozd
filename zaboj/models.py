@@ -9,9 +9,7 @@ from tozd.settings import AUTH_USER_MODEL as User
 from users.models import Distributer
 
 class Vegetable(models.Model):
-    """
-    Veggie model
-    """
+    """ Veggie model """
     name = models.CharField(max_length=50)
     #user = models.ManyToManyField(User, through='UserPreference')
 
@@ -28,7 +26,7 @@ class Order(models.Model):
 
     user = models.ForeignKey(User)
     quantity = models.FloatField(choices=choices)
-    notes = models.TextField(max_length=400, help_text='Max 400 znakov.')
+    notes = models.TextField(max_length=400, help_text='Max 400 znakov.', verbose_name="Opombe")
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
@@ -37,15 +35,11 @@ class Order(models.Model):
     + " by " + str(self.user)
 
     def pretty_date(self):
-        """
-        Returns a formatted date string
-        """
+        """ Returns a formatted date string """
         return self.created.strftime('%#d. %#m. %Y')
 
     def get_absolute_url(self):
-        """
-        Redirect after edit.
-        """
+        """ Redirect after edit. """
         return '/u/me'
 
     def is_processed(self):
@@ -79,9 +73,7 @@ class Order(models.Model):
         return "No action required"
 
 class Crate(models.Model):
-    """
-    Crate model
-    """
+    """ Crate model """
     number = models.PositiveIntegerField()
     at_user = models.ForeignKey(User, null=True, blank=True)
     at_distributer = models.ForeignKey(Distributer, null=True, blank=True)

@@ -1,13 +1,11 @@
-"""
-Views for ZaBoj
-"""
+""" Views for ZaBoj """
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import CreateView
-from .models import Order
+from .forms import OrderForm
+#from .models import Order
 
 class OrderCreate(LoginRequiredMixin, CreateView):
-    model = Order
-    fields = ['quantity', 'notes']
+    form_class = OrderForm
     template_name = 'zaboj/order_form.html'
 
     def form_valid(self, form):
