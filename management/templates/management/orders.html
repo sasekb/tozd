@@ -3,25 +3,10 @@
 {% block head_title %}Vsa naročila || {{ block.super }}{% endblock head_title %}
 
 
-
 {% block content %}
-<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-<script>
-$( function() {
-  $( "#datepicker" ).datepicker({
-      dateFormat: "yy-mm-dd"
-  });
-} );
-</script>
+{% include 'management/filter_form.html' with dest='orders' %}
 
-<form method="get" action="{% url 'orders' %}">
-        Pokaži sprocesirane: <input type="checkbox" name="show_processed" value="1" {% if show_processed %}checked{% endif %}>  
-        <p><input type="submit" name="submit" value="submit"/></p>
-    </form>
-
-<table>
+<table class="table table-striped table-responsive table-sm">
     <tr>
         <td><a href="?orderby=user">Username</a></td>
         <td><a href="?orderby=quantity">Količina</a></td>

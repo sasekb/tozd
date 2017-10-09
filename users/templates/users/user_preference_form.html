@@ -8,10 +8,13 @@
 {% load staticfiles %} 
 <h1>Posodobi podatke</h1>
 
-<form action="" method="post">{% csrf_token %}
+<form action="" method="post" class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4">{% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="Shrani" />
+    <input type="submit" value="Shrani" class="form-control btn btn-outline-primary" />
 </form>
 
 <!--{##% include 'snippets/sidebar.html' %}-->
+{% endblock  %}
+
+{% block jquery %}
 {% endblock  %}

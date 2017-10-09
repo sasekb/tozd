@@ -9,6 +9,7 @@ from django.views.generic.list import ListView
 from tozd.settings import PRICE_ZABOJ
 from users.models import Distributer
 from zaboj.models import Order, Crate
+from .forms import ProcessOrderForm
 from .models import ZabojProduction, ZabojDistribution
 
 class OrdersList(PermissionRequiredMixin, ListView):
@@ -18,8 +19,6 @@ class OrdersList(PermissionRequiredMixin, ListView):
     permission_required = 'is_staff'
     model = Order
     template_name = 'management/orders.html'
-    end = datetime.now()
-    past_week = datetime.now() - timedelta(days=14)
 
     def get_queryset(self):
         filter_val = self.request.GET.get('show_processed', None)
@@ -39,16 +38,17 @@ class OrdersList(PermissionRequiredMixin, ListView):
 
 class ProcessOrder(CreateView):
     """ Fill out production details """
-    model = ZabojProduction
+    form_class = ProcessOrderForm
     template_name = 'management/fillout_order.html'
-    fields = ['crate', 'distribution_notes', 'enduser_notes', 'assign_to', 'price']
 
     def get_form(self):
+        """ get form to change fields """
         form = super(ProcessOrder, self).get_form()
         form.fields['crate'].queryset = Crate.objects.filter(at_user=None).filter(at_distributer=None).filter(in_repairs=False)
         return form
 
     def get_initial(self):
+        """ set initial state """
         order = get_object_or_404(Order, id=self.kwargs.get('order'))
         distributer = Distributer.objects.filter(district=order.user.district).first()
         return {
@@ -57,6 +57,7 @@ class ProcessOrder(CreateView):
         }
 
     def form_valid(self, form):
+        """ if the saved form is valid save everything you need to save """
         # move crate to the distributer
         crate = get_object_or_404(Crate, id=form.instance.crate.id)
         crate.at_distributer = form.instance.assign_to
@@ -67,20 +68,21 @@ class ProcessOrder(CreateView):
 
 class UpdateProcessOrder(UpdateView):
     """ Update production details """
-    model = ZabojProduction
+    form_class = ProcessOrderForm
     template_name = 'management/fillout_order.html'
-    fields = ['crate', 'distribution_notes', 'enduser_notes', 'assign_to', 'price']
 
     def get_form(self):
-        
+        """ get form to change fields """
         form = super(UpdateProcessOrder, self).get_form()
         form.fields['crate'].queryset = Crate.objects.filter(at_user=None).filter(at_distributer=None).filter(in_repairs=False) | Crate.objects.filter(id=self.object.crate.id)
         return form
 
     def get_object(self):
+        """ get the object we want to edit """
         return get_object_or_404(ZabojProduction, order__id=self.kwargs.get('order'))
 
     def form_valid(self, form):
+        """ if the saved form is valid save everything you need to save """
         # move crate to the distributer
         crate = get_object_or_404(Crate, id=form.instance.crate.id)
         crate.at_distributer = form.instance.assign_to
@@ -98,7 +100,7 @@ class DeliveriesDistributerList(PermissionRequiredMixin, ListView):
     template_name = 'management/deliveries.html'
 
     def get_queryset(self):
-        filter_val = self.request.GET.get('show_delivered', None)
+        filter_val = self.request.GET.get('show_processed', None)
         user = get_object_or_404(Distributer, user=self.request.user)
         if filter_val:
             queryset = ZabojProduction.objects.filter(assign_to=user).order_by('-created')
@@ -109,7 +111,9 @@ class DeliveriesDistributerList(PermissionRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         """ Additional context. """
         context = super(DeliveriesDistributerList, self).get_context_data(**kwargs)
-        context['show_delivered'] = self.request.GET.get('show_delivered', False)
+        context['show_processed'] = self.request.GET.get('show_processed', False)
+        if context['show_processed']:
+            context['zaboj_deliveries'] = ZabojDistribution.objects.values_list('id', flat=True)
         return context
 
 class DeliveriesAllList(PermissionRequiredMixin, ListView):
@@ -121,7 +125,7 @@ class DeliveriesAllList(PermissionRequiredMixin, ListView):
     template_name = 'management/deliveries.html'
 
     def get_queryset(self):       
-        filter_val = self.request.GET.get('show_delivered', None)
+        filter_val = self.request.GET.get('show_processed', None)
         if(filter_val):
             queryset = ZabojProduction.objects.all().order_by('-created')
         else:
@@ -129,11 +133,10 @@ class DeliveriesAllList(PermissionRequiredMixin, ListView):
         return queryset
 
     def get_context_data(self, **kwargs):
-        """
-        Additional context.
-        """
+        """ Additional context. """
         context = super(DeliveriesAllList, self).get_context_data(**kwargs)
-        context['show_delivered'] = self.request.GET.get('show_delivered', False)
+        context['show_processed'] = self.request.GET.get('show_processed', False)
+        context['all'] = True
         return context
 
 class DeliverOrder(CreateView):

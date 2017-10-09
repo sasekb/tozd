@@ -33,3 +33,8 @@ class UserPreferenceForm(ModelForm):
         """ Meta for the form. """
         model = User
         fields = ('likes', 'dislikes',)
+    
+    def __init__(self, *args, **kwargs):
+        super(UserPreferenceForm, self).__init__(*args, **kwargs)
+        self.fields['likes'].widget.attrs.update({'class' : 'form-control custom-select', 'style': 'height: 100%;'})
+        self.fields['dislikes'].widget.attrs.update({'class' : 'form-control custom-select', 'style': 'height: 100%;'})

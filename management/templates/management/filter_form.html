@@ -1,0 +1,8 @@
+<form method="get" action="{% url dest %}" class="form-inline mb-3">
+    <div class="form-check mb-3 mr-sm-2 mb-sm-2">
+        <label class="form-check-label">
+            <input class="form-check-input" type="checkbox" name="show_processed" value="1" {% if show_processed %}checked{% endif %}>   Pokaži sprocesirane
+        </label>
+    </div>
+    <input type="submit" value="Prikaži" class="form-control btn btn-outline-primary" />    </form>
+</form>
