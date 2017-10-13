@@ -12,9 +12,7 @@ from .forms import ProcessOrderForm
 from .models import ZabojProduction, ZabojDistribution
 
 class OrdersList(PermissionRequiredMixin, ListView):
-    """
-    View all orders and filter them.
-    """
+    """ View all orders and filter them. """
     permission_required = 'is_staff'
     model = Order
     template_name = 'management/orders.html'
@@ -41,7 +39,7 @@ class ProcessOrder(CreateView):
     template_name = 'management/fillout_order.html'
 
     def get_context_data(self):
-        """ pas user preferences """
+        """ pass user preferences """
         context = super(ProcessOrder, self).get_context_data()
         order = get_object_or_404(Order, id=self.kwargs.get('order'))
         context['ordered_by'] = order.user
@@ -77,6 +75,13 @@ class UpdateProcessOrder(UpdateView):
     form_class = ProcessOrderForm
     template_name = 'management/fillout_order.html'
 
+    def get_context_data(self):
+        """ pas user preferences """
+        context = super(UpdateProcessOrder, self).get_context_data()
+        order = get_object_or_404(Order, id=self.kwargs.get('order'))
+        context['ordered_by'] = order.user
+        return context
+
     def get_form(self):
         """ get form to change fields """
         form = super(UpdateProcessOrder, self).get_form()
@@ -97,27 +102,30 @@ class UpdateProcessOrder(UpdateView):
         form.instance.prepared_by = self.request.user
         return super(UpdateProcessOrder, self).form_valid(form)
 
-class DeliveriesDistributerList(PermissionRequiredMixin, ListView):
-    """
-    View all orders and filter them.
-    """
+class DeliveriesList(PermissionRequiredMixin, ListView):
+    """ View all orders and filter them. """
     permission_required = 'is_staff'
     model = ZabojProduction
     template_name = 'management/deliveries.html'
 
     def get_queryset(self):
-        filter_val = self.request.GET.get('show_processed', None)
+        queryset = ZabojProduction.objects
+        show_processed = self.request.GET.get('show_processed', None)
+        show_all = self.request.GET.get('show_all', None)
         user = get_object_or_404(Distributer, user=self.request.user)
-        if filter_val:
-            queryset = ZabojProduction.objects.filter(assign_to=user).order_by('-created')
+        if not show_all:
+            queryset = queryset.filter(assign_to=user)
+        if show_processed:
+            queryset = queryset.order_by('-created')
         else:
-            queryset = ZabojProduction.objects.filter(assign_to=user).exclude(id__in=ZabojDistribution.objects.values_list('package')).order_by('-created')
+            queryset = queryset.exclude(id__in=ZabojDistribution.objects.values_list('package')).order_by('-created')
         return queryset
 
     def get_context_data(self, **kwargs):
         """ Additional context. """
-        context = super(DeliveriesDistributerList, self).get_context_data(**kwargs)
+        context = super(DeliveriesList, self).get_context_data(**kwargs)
         context['show_processed'] = self.request.GET.get('show_processed', False)
+        context['show_all'] = self.request.GET.get('show_all', False)
         if context['show_processed']:
             context['zaboj_deliveries'] = ZabojDistribution.objects.values_list('id', flat=True)
         return context
@@ -125,6 +133,9 @@ class DeliveriesDistributerList(PermissionRequiredMixin, ListView):
 class DeliveriesAllList(PermissionRequiredMixin, ListView):
     """
     View all orders and filter them.
+    
+    THIS FUNCTIONALITY IS REDUNDANT
+    We will delete it once we've made the DeliveriesList more secure!
     """
     permission_required = 'is_staff'
     model = ZabojProduction
