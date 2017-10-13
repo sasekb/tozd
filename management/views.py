@@ -1,7 +1,6 @@
 """
 Views for order management.
 """
-from datetime import datetime, timedelta
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.views.generic.edit import CreateView, UpdateView
@@ -40,6 +39,13 @@ class ProcessOrder(CreateView):
     """ Fill out production details """
     form_class = ProcessOrderForm
     template_name = 'management/fillout_order.html'
+
+    def get_context_data(self):
+        """ pas user preferences """
+        context = super(ProcessOrder, self).get_context_data()
+        order = get_object_or_404(Order, id=self.kwargs.get('order'))
+        context['ordered_by'] = order.user
+        return context
 
     def get_form(self):
         """ get form to change fields """
@@ -124,9 +130,9 @@ class DeliveriesAllList(PermissionRequiredMixin, ListView):
     model = ZabojProduction
     template_name = 'management/deliveries.html'
 
-    def get_queryset(self):       
+    def get_queryset(self):
         filter_val = self.request.GET.get('show_processed', None)
-        if(filter_val):
+        if filter_val:
             queryset = ZabojProduction.objects.all().order_by('-created')
         else:
             queryset = ZabojProduction.objects.exclude(id__in=ZabojDistribution.objects.values_list('package')).order_by('-created')
