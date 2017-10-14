@@ -8,7 +8,7 @@ from django.views.generic.list import ListView
 from tozd.settings import PRICE_ZABOJ
 from users.models import Distributer
 from zaboj.models import Order, Crate
-from .forms import ProcessOrderForm
+from .forms import ProcessOrderForm, DeliverOrderForm
 from .models import ZabojProduction, ZabojDistribution
 
 class OrdersList(PermissionRequiredMixin, ListView):
@@ -30,7 +30,7 @@ class OrdersList(PermissionRequiredMixin, ListView):
         context = super(OrdersList, self).get_context_data(**kwargs)
         context['show_processed'] = self.request.GET.get('show_processed', False)
         if context['show_processed']:
-            context['zaboj_productions'] = ZabojProduction.objects.values_list('id', flat=True)
+            context['zaboj_productions'] = ZabojProduction.objects.values_list('order_id', flat=True)
         return context
 
 class ProcessOrder(CreateView):
@@ -127,13 +127,13 @@ class DeliveriesList(PermissionRequiredMixin, ListView):
         context['show_processed'] = self.request.GET.get('show_processed', False)
         context['show_all'] = self.request.GET.get('show_all', False)
         if context['show_processed']:
-            context['zaboj_deliveries'] = ZabojDistribution.objects.values_list('id', flat=True)
+            context['zaboj_deliveries'] = ZabojDistribution.objects.values_list('package_id', flat=True)
         return context
 
 class DeliveriesAllList(PermissionRequiredMixin, ListView):
     """
     View all orders and filter them.
-    
+
     THIS FUNCTIONALITY IS REDUNDANT
     We will delete it once we've made the DeliveriesList more secure!
     """
@@ -157,12 +157,16 @@ class DeliveriesAllList(PermissionRequiredMixin, ListView):
         return context
 
 class DeliverOrder(CreateView):
-    """
-    Edit the delivery status.
-    """
-    model = ZabojDistribution
+    """ Edit the delivery status. """
+    form_class = DeliverOrderForm
     template_name = 'management/fillout_delivery.html'
-    fields = ['money_received', 'is_extra_donation', 'notes']
+
+    def get_context_data(self):
+        """ pass notes for the distributer """
+        context = super(DeliverOrder, self).get_context_data()
+        package = get_object_or_404(ZabojProduction, id=self.kwargs.get('package'))
+        context['package'] = package
+        return context
 
     def get_initial(self):
         package = get_object_or_404(ZabojProduction, id=self.kwargs.get('package'))
@@ -178,6 +182,9 @@ class DeliverOrder(CreateView):
         crate.at_distributer = None
         crate.at_user = order.user
         crate.save()
+        # save package and assign delivery to currently logged-in user
         form.instance.package = package
         form.instance.delivered_by = self.request.user
+        # create money trail
+
         return super(DeliverOrder, self).form_valid(form)

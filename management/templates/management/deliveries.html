@@ -5,18 +5,13 @@
 
 
 {% block content %}
-{% if all %}
-{% include 'management/filter_form.html' with dest='deliveries_all' %}
-{% else %}
 {% include 'management/filter_form.html' with dest='deliveries' %}
-{% endif %}
-
-{{zaboj_deliveries}}
 
 <table class="table table-striped table-responsive table-sm">
     <tr>
         <td><a href="?orderby=user">Username</a></td>
         <td><a href="?orderby=quantity">Količina</a></td>
+        <td>ID</td>
         <td>Opombe</td>
         <td>Datum</td>
         <td>Distributer</td>
@@ -26,6 +21,7 @@
         <tr>
             <td>{{ package.order.user.username }}</td>
             <td>{{ package.order.quantity }}</td>
+            <td>{{ package.id }}</td>
             <td>{{ package.distribution_notes }}</td>
             <td>{{ package.created|date }}</td>
             <td>{{ package.assign_to }}</td>

@@ -3,7 +3,7 @@
         <label class="form-check-label">
             <input class="form-check-input" type="checkbox" name="show_processed" value="1" {% if show_processed %}checked{% endif %}>   Pokaži sprocesirane
         </label>
-        {% if user.is_staff %}
+        {% if dest == 'deliveries' %}
         <label class="form-check-label">
                 <input class="form-check-input ml-3" type="checkbox" name="show_all" value="1" {% if show_all %}checked{% endif %}>   Pokaži dostave vseh distributerjev
         </label>

@@ -5,8 +5,20 @@
 
 
 {% block content %}
-<form action="" method="post">{% csrf_token %}
+<div class="alert alert-info" role="alert">
+        <p class="mb-0">
+            Obvestilo za distributerja: <br />
+            {{ package.distribution_notes }}
+        </p>
+        <ul>
+            {% for like in ordered_by.likes.all %}
+                <li>{{ like }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+<form action="" method="post" class="form-horizontal">{% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="Sprovedi" />
+    <input type="submit" value="Sprovedi" class="form-control col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 btn btn-outline-primary" />
 </form>
 {% endblock  %}
