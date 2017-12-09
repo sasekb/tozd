@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block head_title %}Pregled izdelka || {{ block.super }}{% endblock head_title %}
+
+
+{% block content %}
+
+{{ product }}
+{% if product.variation_set.count > 1 %}
+<select class="form-control">
+{% for variation in product.variation_set.all %}
+<option value="{{variation.pk}}">{{variation.title}}</option>
+{% endfor %}
+{% endif %}
+</select>
+
+<br>
+<a href="#">Dodaj v košarico</a>
+{% endblock %}

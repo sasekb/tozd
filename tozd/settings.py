@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'users',
     'zaboj',
     'management',
+    'products',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

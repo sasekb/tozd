@@ -1,4 +1,4 @@
-"""tozd URL Configuration
+"""users URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.11/topics/http/urls/
@@ -13,15 +13,11 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url, include
-from django.contrib import admin
-from django.views.generic.base import TemplateView
+from django.conf.urls import url
+from .views import ProductDetailView, ProductListView
+
 
 urlpatterns = [
-    url(r'^$', TemplateView.as_view(template_name="index.html")),
-    url(r'^admin/', admin.site.urls),
-    url(r'^shop/', include('products.urls'), name='shop'),
-    url(r'^u/', include('users.urls'), name='users'),
-    url(r'^zaboj/', include('zaboj.urls'), name='zaboj'),
-    url(r'^mng/', include('management.urls'), name='management'),
+    url(r'^$', ProductListView.as_view(), name='product_list'),
+    url(r'^(?P<pk>\d+)/$', ProductDetailView.as_view(), name='product_detail'),
 ]
