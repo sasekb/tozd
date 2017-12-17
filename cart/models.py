@@ -13,7 +13,7 @@ class Cart(models.Model):
     items = models.ManyToManyField(
         Variation,
         through='CartItem',
-        through_fields=('cart', 'item'),
+        through_fields=('cart', 'item', 'quantity'),
     )
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -31,16 +31,25 @@ class Cart(models.Model):
     @property
     def tax_total(self):
         """
-        Returns the total price of the cart
+        Returns the total tax value of the cart
         """
         return sum([float(line.line_tax_total) for line in self.cartitem_set.all()])
 
     @property
     def subtotal(self):
         """
-        Returns the total price of the cart
+        Returns the total price of the cart without the tax.
         """
         return sum([float(line.line_subtotal) for line in self.cartitem_set.all()])
+
+    @property
+    def item_count(self):
+        """
+        Returns the count of items in the cart
+        """
+        for item in self.cartitem_set.all():
+            print(item, item.quantity)
+        return sum([item.quantity for item in self.cartitem_set.all()])
 
 class CartItem(models.Model):
     """

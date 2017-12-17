@@ -22,6 +22,9 @@ $(document).ready(function() {
 	var pathname = window.location.pathname;
     $('.nav-item.active').removeClass('active');
 	$('.nav-item > a[href="'+pathname+'"]').parent().addClass('active');
+    if ($("#item-count").text() != 0) {
+        $("#item-count").removeClass("invisible");
+    }
     {% block jquery %}
     {% endblock jquery %}
 });

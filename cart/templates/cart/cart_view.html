@@ -7,7 +7,7 @@
 {% block content %}
 <div class="container" style="width:100%">
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <p class="alert-message"></p>
+        <p id="alert-message">{{ message }}</p>
     </div>
 </div>
 <div class='row main-content'>
@@ -28,22 +28,26 @@
             <td>Odstrani</td>
         </tr>
     
-    {% for item in cart.cartitem_set.all %}
-    
-    <tr id='item-{{ item.item.id }}'>
-        <td>{{ item.item }}</td>
-        <td>
-            <input class="item" type="hidden" name="item" value="{{item.item.id}}" />
-            <input class="qty" type="number" name="qty" value="{{item.quantity }}" />
-        </td>
-        <td>{{ item.item.price }}€</td>
-        <td class="line-total">{{ item.line_total|floatformat:2 }}€</td>
-        <td><a href="{% url 'cart' %}?item={{ item.item.id }}&rm=True"><i class="fa fa-times-circle" aria-hidden="true"></i></td>
-    </tr>
-    
-    {% endfor %}
-    
-    <tr>
+        {% for item in cart.cartitem_set.all %}
+        
+        <tr id='item-{{ item.item.id }}'>
+            <td>{{ item.item }}</td>
+            <td>
+                <input class="item" type="hidden" name="item" value="{{item.item.id}}" />
+                <input class="qty" type="number" name="qty" value="{{item.quantity }}" />
+            </td>
+            <td>{{ item.item.price }}€</td>
+            <td class="line-total">{{ item.line_total|floatformat:2 }}€</td>
+            <td><a href="{% url 'cart' %}?item={{ item.item.id }}&rm=True"><i class="fa fa-times-circle" aria-hidden="true"></i></td>
+        </tr>
+        
+        {% endfor %}
+
+        <tr>
+            <td  colspan='5' class='text-right'>Nova in vrnjena embalaža bo obračunana v naslednjem koraku.</td>
+        </tr>
+
+        <tr>
             <td  colspan='5' class='text-right'>Skupaj brez DDV: <span id='subtotal'>{{ cart.subtotal|floatformat:2 }}</span>€</td>
         </tr>
         
@@ -59,7 +63,7 @@
         <tr>
             <td colspan='5' class='text-right'><a class='btn btn-warning' href="#">Na blagajno</a></td>
         </tr>
-    
+        
     </table>
     
     
@@ -71,6 +75,11 @@
 
     {% block jquery %}
         $(".alert").hide()
+        if ({{delete}} == 1) {
+            $(".alert").show();
+            window.setTimeout(function () { 
+                $(".alert").hide("slow"); }, 2000);
+        }
 
         $(".qty").change(function(){
             var qty = $(this).val()
@@ -79,6 +88,7 @@
                 type: "GET",
                 url: "./?item=" + item + "&qty=" + qty,
                 success: function (response) {
+                    $("#alert-message").text(response.message);
                     $(".alert").show();
                     window.setTimeout(function () { 
                         $(".alert").hide("slow"); }, 2000);
@@ -86,6 +96,7 @@
                     $("#total").text(response.total)
                     $("#tax-total").text(response.taxTotal)
                     $("#subtotal").text(response.subtotal)
+                    console.log(response.itemCount)
                 },
                 error: function (response) {
                   alert(response.status);

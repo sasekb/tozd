@@ -54,6 +54,8 @@ class Variation(models.Model):
     objects = ProductManager()
 
     def __str__(self):
+        if self.title == "Default":
+            return self.product.title
         return f'{self.product.title} - {self.title}'
 
     def get_absolute_url(self):

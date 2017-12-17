@@ -6,7 +6,7 @@
 {% block content %}
 <div class="container" style="width:100%">
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <p class="alert-message"></p>
+        <p id="alert-message"></p>
     </div>
 </div>
 <div class="row">
@@ -60,9 +60,12 @@
             type: "GET",
             url: "{% url 'cart' %}?item=" + item + "&qty=" + qty,
             success: function (response) {
+                $("#alert-message").text(response.message);
                 $(".alert").show();
                 window.setTimeout(function () { 
                     $(".alert").hide("slow"); }, 2000);
+                $("#item-count").text(response.itemCount)
+                $("#item-count").removeClass("invisible");
             },
             error: function (response) {
               alert(response.status);
