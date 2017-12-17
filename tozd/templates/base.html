@@ -15,7 +15,17 @@
 
 
 {% include 'snippets/js.html' %}
-{% block jquery %}
-{% endblock jquery %}
+
+
+<script>
+$(document).ready(function() {
+	var pathname = window.location.pathname;
+    $('.nav-item.active').removeClass('active');
+	$('.nav-item > a[href="'+pathname+'"]').parent().addClass('active');
+    {% block jquery %}
+    {% endblock jquery %}
+});
+</script>
+
 </body>
 </html>

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block head_title %}Pregled košarice || {{ block.super }}{% endblock head_title %}
+
+
+
+{% block content %}
+<div class="container" style="width:100%">
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <p class="alert-message"></p>
+    </div>
+</div>
+<div class='row main-content'>
+    {% if cart.cartitem_set.count < 1 %}
+    
+    {#% include "carts/empty_cart.html" %#}
+    {% else %}
+    
+    <div class='col-sm-8 col-sm-offset-2'>
+    
+    <h2>Tvoja košarica:</h2>
+    <table class='table'> 
+        <tr id='item-{{ item.item.id }}'>
+            <td>Ime izdelka</td>
+            <td>Količina</td>
+            <td>Cena/kos</td>
+            <td>Cena</td>
+            <td>Odstrani</td>
+        </tr>
+    
+    {% for item in cart.cartitem_set.all %}
+    
+    <tr id='item-{{ item.item.id }}'>
+        <td>{{ item.item }}</td>
+        <td>
+            <input class="item" type="hidden" name="item" value="{{item.item.id}}" />
+            <input class="qty" type="number" name="qty" value="{{item.quantity }}" />
+        </td>
+        <td>{{ item.item.price }}€</td>
+        <td class="line-total">{{ item.line_total|floatformat:2 }}€</td>
+        <td><a href="{% url 'cart' %}?item={{ item.item.id }}&rm=True"><i class="fa fa-times-circle" aria-hidden="true"></i></td>
+    </tr>
+    
+    {% endfor %}
+    
+    <tr>
+            <td  colspan='5' class='text-right'>Skupaj brez DDV: <span id='subtotal'>{{ cart.subtotal|floatformat:2 }}</span>€</td>
+        </tr>
+        
+        <tr>
+            <td colspan='5' class='text-right'>DDV: <span id='tax-total'>{{ cart.tax_total|floatformat:2 }}</span>€</td>
+        </tr>
+        
+        <tr>
+            <td colspan='5' class='text-right'>Skupaj: <span id='total'>{{ cart.total|floatformat:2 }}</span>€</td>
+        </tr>
+        
+        
+        <tr>
+            <td colspan='5' class='text-right'><a class='btn btn-warning' href="#">Na blagajno</a></td>
+        </tr>
+    
+    </table>
+    
+    
+    </div>
+    {% endif %}
+    
+    </div>
+    {% endblock %}
+
+    {% block jquery %}
+        $(".alert").hide()
+
+        $(".qty").change(function(){
+            var qty = $(this).val()
+            var item = $(this).prev().val()
+            $.ajax({
+                type: "GET",
+                url: "./?item=" + item + "&qty=" + qty,
+                success: function (response) {
+                    $(".alert").show();
+                    window.setTimeout(function () { 
+                        $(".alert").hide("slow"); }, 2000);
+                    $("#item-" + response.item).find(".line-total").text(response.lineTotal + "€")
+                    $("#total").text(response.total)
+                    $("#tax-total").text(response.taxTotal)
+                    $("#subtotal").text(response.subtotal)
+                },
+                error: function (response) {
+                  alert(response.status);
+                }
+              });
+        });
+    {% endblock %}

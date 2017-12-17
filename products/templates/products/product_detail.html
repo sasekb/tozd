@@ -4,16 +4,69 @@
 
 
 {% block content %}
+<div class="container" style="width:100%">
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <p class="alert-message"></p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-8">
+        <div>
+            {% if product.productimage_set.count > 0 %}
+                {% for image in product.productimage_set.all %}
+                <img class="img-fluid" src="{{ image.image.url }}" alt="{{ product.title }}">
+                {% endfor %}
+            {% endif %}
+        </div>
+        <h2>{{ product.title }}</h2>
+        <P>{{ product.description }}</P>
+    </div>
+    <!-- Stranska vrstica - produkt -->
+    <div class="col-4">
+            {% if product.variation_set.count > 1 %}
+            <h3 id="price">{{ product.variation_set.first.price }}€</h3>
+            <select name="item" class="form-control" id="select-variation">
+                {% for variation in product.variation_set.all %}
+                <option value="{{variation.pk}}" data-price="{{variation.price}}">{{variation.title}}</option>
+                {% endfor %}
+            </select>
+            {% else %}
+            <h3 id="price">{{ product.price }}€</h3>
+            <input type="hidden" id="select-variation" value="{{ product.variation_set.first.id }}"
+            {% endif %}
+            <br>
+            <input class="form-control" type="number" value="1" id="qty" />
+            <br>
+            <input type="submit" id="add-cart" class="btn btn-default" value="Add to cart">
+        <hr>
+        <h6>Drugi so kupili še:</h6>
+    </div>    
+    <!-- End Stranska vrstica - produkt -->
+</div>
 
-{{ product }}
-{% if product.variation_set.count > 1 %}
-<select class="form-control">
-{% for variation in product.variation_set.all %}
-<option value="{{variation.pk}}">{{variation.title}}</option>
-{% endfor %}
-{% endif %}
-</select>
-
-<br>
-<a href="#">Dodaj v košarico</a>
 {% endblock %}
+
+{% block jquery %}
+    $(".alert").hide()
+    $("#select-variation").change(function(){
+        var price = $("#select-variation option:selected").attr("data-price")
+        $("#price").text(price + "€")
+    });
+    $("#add-cart").click(function(){
+        var item = $("#select-variation option:selected").val();
+        if (item == undefined) item = $("#select-variation").val();
+        var qty = $("#qty").val();
+        $.ajax({
+            type: "GET",
+            url: "{% url 'cart' %}?item=" + item + "&qty=" + qty,
+            success: function (response) {
+                $(".alert").show();
+                window.setTimeout(function () { 
+                    $(".alert").hide("slow"); }, 2000);
+            },
+            error: function (response) {
+              alert(response.status);
+            }
+          });
+    })
+{% endblock jquery %}

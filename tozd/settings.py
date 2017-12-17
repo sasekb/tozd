@@ -15,6 +15,8 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
@@ -35,6 +37,7 @@ INSTALLED_APPS = [
     'zaboj',
     'management',
     'products',
+    'cart',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -123,9 +126,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-AUTH_USER_MODEL = 'users.User'
+MEDIA_URL = "/media/"
 
+#AUTH
+SESSION_SAVE_EVERY_REQUEST = True
+AUTH_USER_MODEL = 'users.User'
 LOGIN_REDIRECT_URL = '/u/me'
 LOGIN_URL = '/u/login'
 
+# Misc
 PRICE_ZABOJ = 4.0

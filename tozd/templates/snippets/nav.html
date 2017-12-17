@@ -1,6 +1,6 @@
 <nav class="navbar sticky-top navbar-expand-md navbar-dark bg-dark mb-3">
     <div class="container">
-        <a class="navbar-brand" href="#">
+        <a class="navbar-brand" href="{% url 'index' %}">
         <img src="http://www.eatlogos.com/alphabet_logos/png/vector_alphabet_t_letter_cut_logo.png" width="30" height="30" class="d-inline-block align-top" alt="TOZD logo">
         NDP TOZD
         </a>
@@ -10,16 +10,22 @@
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                <a class="nav-link" href="#">Domov <span class="sr-only">(current)</span></a>
+                <a class="nav-link" href="{% url 'index' %}">Domov <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="#">Izdelki</a>
+                <a class="nav-link" href="{% url 'product_list' %}">Izdelki</a>
                 </li>
                 <li class="nav-item">
                 <a class="nav-link" href="#">O nas</a>
                 </li>
             </ul>
             <ul class="navbar-nav">
+                {% if request.user.is_authenticated %}
+                <li>
+                    <a href="{% url 'cart' %}">
+                        <i class="fas fa-shopping-cart" style="color:white; font-size: 20px; padding: 10px 0px;"></i><span class="badge badge-danger invisible" style="margin-right: 10px;">0</span>
+                    </a>
+                </li>
                 <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Moj profil
@@ -28,9 +34,30 @@
                     <a class="dropdown-item" href="#">Podatki</a>
                     <a class="dropdown-item" href="#">Naročila</a>
                     <a class="dropdown-item" href="#">Plačila</a>
+                    <hr>
+                    <a class="dropdown-item" href="{% url 'logout' %}">Odjava</a>
                 </div>
+                {% else %}
+                <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Prijava
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <form class='navbar-form' method='POST' action='{% url "login" %}'>{% csrf_token %}
+                        <div class='form-group'>
+                            <input type='text' class='form-control' name='username' placeholder='Username' /> 
+                        </div>
+                        <div class='form-group'>
+                            <input type='password' class='form-control' name='password' placeholder='Password' />
+                        </div>
+                        <button type='submit' class='btn btn-default btn-block'>Login</button>
+                    </form>
+                    <p class='text-center'>Nov uporabnik? <a href='#'>Registriraj se</a>!</p>
+                    <p class='text-center'><a href='#'>Forgot password</a>?</p>
+                </div>
+                {% endif %}
                 </li>
             </ul>
         </div>
-    </div>
+    </div>    
   </nav>

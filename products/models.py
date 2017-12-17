@@ -2,12 +2,19 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.text import slugify
 
 class ProductQueryset(models.query.QuerySet):
+    """
+    queryset to filter out inactive products and variations
+    """
     def active(self):
         return self.filter(active=True)
 
 class ProductManager(models.Manager):
+    """
+    a model manager thet lets us set the default queryset
+    """
     def get_queryset(self):
         return ProductQueryset(self.model, using=self._db)
 
@@ -15,9 +22,13 @@ class ProductManager(models.Manager):
         return self.get_queryset().active()
 
 class Product(models.Model):
+    """
+    Model for products.
+    """
     title = models.CharField(max_length=120)
     description = models.TextField(null=True, blank=True)
     price = models.DecimalField(decimal_places=2, max_digits=8)
+    tax_bracket = models.DecimalField(decimal_places=2, max_digits=4, default="22")
     active = models.BooleanField(default=True)
 
     objects = ProductManager()
@@ -29,10 +40,14 @@ class Product(models.Model):
         return reverse('product_detail', args=[str(self.pk)])
 
 class Variation(models.Model):
+    """
+    Model for product variations.
+    """
     product = models.ForeignKey(Product)
     title = models.CharField(max_length=120)
     description = models.TextField(null=True, blank=True)
     price = models.DecimalField(decimal_places=2, max_digits=8)
+    tax_bracket = models.DecimalField(decimal_places=2, max_digits=4, default="22")
     active = models.BooleanField(default=True)
     inventory = models.PositiveIntegerField(null=True, blank=True)
 
@@ -42,10 +57,17 @@ class Variation(models.Model):
         return f'{self.product.title} - {self.title}'
 
     def get_absolute_url(self):
+        """
+        returns the absolute URL of the product - variations can't "live" on their own
+        """
         return self.product.get_absolute_url
 
 @receiver(post_save, sender=Product)
 def create_default_variation(instance, **kwargs):
+    """
+    When the instance of a Product is saved we should check if a variation exists.
+    If not, we should create one with the title "Default".
+    """
     if instance.variation_set.count() == 0:
         default_variation = Variation()
         default_variation.product = instance
@@ -54,3 +76,18 @@ def create_default_variation(instance, **kwargs):
         default_variation.price = instance.price
         default_variation.active = instance.active
         default_variation.save()
+
+def image_upload_to(instance, filename):
+    print(instance.id)
+    title = instance.product.title
+    slug = slugify(title)
+    basename, file_extension = filename.split(".")
+    new_filename = f'{slug}.{file_extension}'
+    return f'products/{slug}/{new_filename}'
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product)
+    image = models.ImageField(upload_to=image_upload_to)
+    
+    def __str__(self):
+        return self.product.title

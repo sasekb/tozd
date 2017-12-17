@@ -1,3 +1,6 @@
 *.pyc
 ideje.txt
 db.sqlite3
+out/linecount.json
+out/linecount.txt
+.vscode
