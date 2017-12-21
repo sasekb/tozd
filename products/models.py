@@ -1,4 +1,4 @@
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -43,7 +43,7 @@ class Variation(models.Model):
     """
     Model for product variations.
     """
-    product = models.ForeignKey(Product)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     title = models.CharField(max_length=120)
     description = models.TextField(null=True, blank=True)
     price = models.DecimalField(decimal_places=2, max_digits=8)
@@ -88,7 +88,7 @@ def image_upload_to(instance, filename):
     return f'products/{slug}/{new_filename}'
 
 class ProductImage(models.Model):
-    product = models.ForeignKey(Product)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     image = models.ImageField(upload_to=image_upload_to)
     
     def __str__(self):

@@ -9,7 +9,7 @@ class Cart(models.Model):
     """
     Shopping cart contains the order.
     """
-    user = models.ForeignKey(User, null=True, blank=True)
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
     items = models.ManyToManyField(
         Variation,
         through='CartItem',

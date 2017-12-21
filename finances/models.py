@@ -5,10 +5,10 @@ from users.models import Distributer
 
 class Income(models.Model):
     """ Track all of the incomes. """
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     value = models.DecimalField()
     is_donation = models.BooleanField(default=False)
-    current_loc = models.ForeignKey(Distributer)
+    current_loc = models.ForeignKey(Distributer, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 

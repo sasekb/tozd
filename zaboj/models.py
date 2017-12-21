@@ -24,7 +24,7 @@ class Order(models.Model):
     """ Model for orders. """
     choices = [(0.5, '0,5 kg') if i == 0 else (float(i), str(i) + ' kg') for i in range(0, 11)]
 
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     quantity = models.FloatField(choices=choices)
     notes = models.TextField(max_length=400, help_text='Max 400 znakov.', verbose_name="Opombe")
     created = models.DateTimeField(auto_now_add=True)
@@ -75,8 +75,8 @@ class Order(models.Model):
 class Crate(models.Model):
     """ Crate model """
     number = models.PositiveIntegerField()
-    at_user = models.ForeignKey(User, null=True, blank=True)
-    at_distributer = models.ForeignKey(Distributer, null=True, blank=True)
+    at_user = models.ForeignKey(User, null=True, blank=True, on_delete=models.CASCADE)
+    at_distributer = models.ForeignKey(Distributer, null=True, blank=True, on_delete=models.CASCADE)
     in_repairs = models.BooleanField(default=False)
 
     def __str__(self):

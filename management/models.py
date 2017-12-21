@@ -10,7 +10,7 @@ class ZabojStorno(models.Model):
     """
     If there is a storno we should collect some data instead of just deleting the order.
     """
-    order = models.ForeignKey(Order)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
     reason = models.TextField(max_length=140)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -22,10 +22,10 @@ class ZabojProduction(models.Model):
     """
     When a crate is prepared this is entered
     """
-    order = models.ForeignKey(Order)
-    prepared_by = models.ForeignKey(User)
-    crate = models.ForeignKey(Crate)
-    assign_to = models.ForeignKey(Distributer)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    prepared_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    crate = models.ForeignKey(Crate, on_delete=models.CASCADE)
+    assign_to = models.ForeignKey(Distributer, on_delete=models.CASCADE)
     distribution_notes = models.TextField(max_length=140, blank=True, null=True)
     enduser_notes = models.TextField(max_length=140, blank=True, null=True)
     price = models.DecimalField(max_digits=5, decimal_places=2)
@@ -46,8 +46,8 @@ class ZabojDistribution(models.Model):
     """
     Model for distribution.
     """
-    package = models.ForeignKey(ZabojProduction)
-    delivered_by = models.ForeignKey(User)
+    package = models.ForeignKey(ZabojProduction, on_delete=models.CASCADE)
+    delivered_by = models.ForeignKey(User, on_delete=models.CASCADE)
     money_received = models.DecimalField(max_digits=5, decimal_places=2)
     is_extra_donation = models.BooleanField(default=False)
     notes = models.TextField(max_length=140)

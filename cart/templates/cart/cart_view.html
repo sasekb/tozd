@@ -96,7 +96,8 @@
                     $("#total").text(response.total)
                     $("#tax-total").text(response.taxTotal)
                     $("#subtotal").text(response.subtotal)
-                    console.log(response.itemCount)
+                    $("#item-count").text(response.itemCount)
+                    $("#item-count").removeClass("invisible");y
                 },
                 error: function (response) {
                   alert(response.status);
