@@ -23,7 +23,7 @@ class CartView(View):
         item_pk = request.GET.get('item')
         quantity = request.GET.get('qty', 1)
         delete = request.GET.get('rm')
-        cart, created = Cart.objects.get_or_create(user=request.user)
+        cart, created = Cart.objects.get_or_create(user=request.user, processed_to_order=False)
         message = ""
         if created:
             cart.save()
@@ -48,7 +48,13 @@ class CartView(View):
             data = {
                 "message": message,
                 "item": item_pk,
+                "qty": cart_item.quantity,
+                "lineSubtotal": format(cart_item.line_subtotal, '.2f'),
+                "lineTaxTotal": format(cart_item.line_tax_total, '.2f'),
                 "lineTotal": format(cart_item.line_total, '.2f'),
+                "pckSubtotal": format(cart_item.line_package_subtotal, '.2f'),
+                "pckTaxTotal": format(cart_item.line_package_tax_total, '.2f'),
+                "pckTotal": format(cart_item.line_package_total, '.2f'),
                 "total": format(cart.total, '.2f'),
                 "taxTotal": format(cart.tax_total, '.2f'),
                 "subtotal": format(cart.subtotal, '.2f'),

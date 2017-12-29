@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block head_title %}Pregled naročila || {{ block.super }}{% endblock head_title %}
+
+
+
+{% block content %}
+<div class='row main-content'>
+    <div class="col-sm-6 col-sm-offset-2 border border-light rounded" style="padding:30px;">
+        <h2>Naslov za izdajo računa</h2>
+        {% for addr in order.orderbillingaddress_set.all %}
+            <strong>{{ addr.name }} {{ addr.surname }}</strong><br>
+            {{ addr.street_name }} {{ addr.street_nr }} <br>
+            {{ addr.zip_code }} {{ addr.city }} <br>
+            {{ addr.country }} <br>
+            {% if addr.vat_nr %}
+                Podjetje: {{ addr.company_name }} <br>
+                Davčna številka: {{ addr.vat_nr }} <br>
+                {% if addr.vat_taxpayer %}
+                Davčni zavezanec: Da
+                {% else %}
+                Davčni zavezanec: Ne
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div class="col-sm-6 col-sm-offset-2 border border-light rounded" style="padding:30px;">
+        <h2>Naslov za dostavo</h2>
+        {% for addr in order.ordershippingaddress_set.all %}
+            {% if addr.vat_nr %}
+            <strong>{{ addr.company_name }} </strong><br>
+            {% endif %}
+            <strong>{{ addr.name }} {{ addr.surname }}</strong><br>
+            {{ addr.street_name }} {{ addr.street_nr }} <br>
+            {{ addr.zip_code }} {{ addr.city }} <br>
+            {{ addr.country }} <br>      
+        {% endfor %}
+    </div>
+
+    <div class='col-sm-12 col-sm-offset-2'>
+    <br>
+    <hr>
+    <h2>Pregled naročila</h2>
+    <table class='table'> 
+        <tr id='item-{{ item.item.id }}'>
+            <td>Ime izdelka</td>
+            <td>Količina</td>
+            <td>Cena/kos</td>
+            <td>Cena brez DDV</td>
+            <td>DDV</td>
+            <td>Cena</td>
+        </tr>
+    
+        {% for item in order.orderitem_set.all %}
+        
+        <tr>
+            <td>{{ item.item_name }}</td>
+            <td>{{ item.item_quantity }}</td>
+            <td>{{ item.item_price|floatformat:2 }}€</td>
+            <td>{{ item.item_subtotal|floatformat:2 }}€</td>
+            <td>{{ item.item_tax_total|floatformat:2 }}€</td>
+            <td>{{ item.item_total|floatformat:2 }}€</td>
+        </tr>
+        {% if item.item_package %}
+        <tr>
+            <td><i class="fas fa-caret-right" style="margin-left:1em;"></i> Embalaža: {{ item.item_package }}</td>
+            <td>{{ item.item_quantity }}</td>
+            <td>{{ item.item_package_price }}€</td>
+            <td>{{ item.item_package_subtotal|floatformat:2 }}€</td>
+            <td>{{ item.item_package_tax_total|floatformat:2 }}€</td>
+            <td>{{ item.item_package_total|floatformat:2 }}€</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+        
+        <tr>
+            <td  colspan='5' class='text-right'>Skupaj brez DDV</td>
+            <td>{{ order.subtotal|floatformat:2 }}€</td>
+        </tr>
+        
+        <tr>
+            <td colspan='5' class='text-right'>DDV</td>
+            <td>{{ order.tax_total|floatformat:2 }}€</td>
+        </tr>
+        
+        <tr>
+            <td colspan='5' class='text-right'>Skupaj</td>
+            <td>{{ order.total|floatformat:2 }}€</td>
+        </tr>
+
+        <tr>
+            <td  colspan='5' class='text-right'>Vrnjene embalaže</td>
+            <td>{{ order.discount_for_returned_package|floatformat:2 }}€</td>
+        </tr>
+
+        <tr>
+            <td colspan='5' class='text-right'>Za plačilo</td>
+            <td>{{ order.to_pay|floatformat:2 }}€</td>
+        </tr>
+        
+        
+        <tr>
+            <td colspan='6' class='text-right'>
+                <a class='btn btn-secondary' href="{% url 'orders_address' %}">Nazaj na izbiro naslova</a>
+                <a class='btn btn-warning' href="#">Na plačilo</a></td>
+        </tr>
+        
+    </table>
+    
+    
+    </div>
+    
+    </div>
+    {% endblock %}
+
+    {% block jquery %}
+    {% endblock %}

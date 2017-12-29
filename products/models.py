@@ -4,6 +4,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.text import slugify
 
+from management.models import PackageType
+
 class ProductQueryset(models.query.QuerySet):
     """
     queryset to filter out inactive products and variations
@@ -30,6 +32,7 @@ class Product(models.Model):
     price = models.DecimalField(decimal_places=2, max_digits=8)
     tax_bracket = models.DecimalField(decimal_places=2, max_digits=4, default="22")
     active = models.BooleanField(default=True)
+    package_type = models.ForeignKey(PackageType, on_delete=models.CASCADE, null=True, blank=True)
 
     objects = ProductManager()
 
@@ -50,6 +53,7 @@ class Variation(models.Model):
     tax_bracket = models.DecimalField(decimal_places=2, max_digits=4, default="22")
     active = models.BooleanField(default=True)
     inventory = models.PositiveIntegerField(null=True, blank=True)
+    package_type = models.ForeignKey(PackageType, on_delete=models.CASCADE, null=True, blank=True)
 
     objects = ProductManager()
 
@@ -77,6 +81,7 @@ def create_default_variation(instance, **kwargs):
         default_variation.description = instance.description
         default_variation.price = instance.price
         default_variation.active = instance.active
+        default_variation.package_type = instance.package_type
         default_variation.save()
 
 def image_upload_to(instance, filename):

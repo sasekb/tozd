@@ -3,7 +3,7 @@ Production data administration.
 """
 from django.contrib import admin
 from .filters import DeliveredFilter
-from .models import ZabojStorno, ZabojProduction, ZabojDistribution
+from .models import ZabojStorno, ZabojProduction, ZabojDistribution, PackageType
 
 @admin.register(ZabojProduction)
 class ZabojProductionAdmin(admin.ModelAdmin):
@@ -32,3 +32,7 @@ class ZabojDistributionAdmin(admin.ModelAdmin):
     date_hierarchy = 'created'
     # details view
     readonly_fields = ('created', 'modified', )
+
+@admin.register(PackageType)
+class PackageTypeAdmin(admin.ModelAdmin):
+    """ Admin enchancements"""

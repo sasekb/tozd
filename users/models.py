@@ -26,7 +26,7 @@ class User(AbstractUser):
     pickup_method = models.IntegerField(choices=[(1, 'Dostava na dom'),
                                                  (2, 'Prevzem pri distributerju'),
                                                  (3, 'Leteči')],
-                                        help_text='1. Dostavmo na dom. \
+                                        help_text='1. Dostavmo na dom (+1€). \
                                                    2. Prevzem v svoji četrti/kraju. \
                                                    3. Prevzem na poti po dogovoru z distributerjem.'
                                         , null=True)
@@ -40,6 +40,34 @@ class User(AbstractUser):
 
     def __str__(self):
         return f'{self.last_name}, {self.first_name} ({self.username})'
+
+class UserBillingAddress(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=120)
+    surname = models.CharField(max_length=120)
+    street_name = models.CharField(max_length=120)
+    street_nr = models.CharField(max_length=10)
+    zip_code = models.PositiveIntegerField()
+    city = models.CharField(max_length=120)
+    country = models.CharField(max_length=120)
+    vat_nr = models.PositiveIntegerField(blank=True, null=True)
+    vat_taxpayer = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'{self.name} {self.surname}, {self.street_name} {self.street_nr}'
+
+class UserShippingAddress(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=120)
+    surname = models.CharField(max_length=120)
+    street_name = models.CharField(max_length=120)
+    street_nr = models.CharField(max_length=10)
+    zip_code = models.PositiveIntegerField()
+    city = models.CharField(max_length=120)
+    country = models.CharField(max_length=120)
+
+    def __str__(self):
+        return f'{self.name} {self.surname}, {self.street_name} {self.street_nr}'
 
 class Distributer(models.Model):
     """

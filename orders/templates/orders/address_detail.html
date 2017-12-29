@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block head_title %}Pregled naslova za dostavo in izdajo računa || {{ block.super }}{% endblock head_title %}
+
+
+{% block content %}
+<div class="alert alert-danger" role="alert">
+    <span id="alert-msg"></span>
+</div>
+
+<h3>Naslov za račun</h3>
+{% if object.userbillingaddress_set.count == 0 %}
+<p>Nimate naslova za dostavo. Dodaj nov naslov.</p>
+
+{% else %}
+{% for address in object.userbillingaddress_set.all %}
+<div class="radio">
+    <label><input type="radio" name="billing-radio" value="{{ address.pk }}"> {{ address.name}} {{ address.surname}} - {{ address.street_name}} {{ address.street_nr}}, {{ address.zip_code}} {{ address.city}} (Davčni zavezanec: {{ address.vat_taxpayer}}, davčna: {{ address.vat_nr }} )</label>
+</div>
+
+
+{% endfor %}
+{% endif %}
+
+<!-- Modal -->
+<div class="modal fade" id="billingModal" tabindex="-1" role="dialog" aria-labelledby="billingModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            
+            <form action="{% url 'orders_address' %}" method="post">
+                <div class="modal-body">
+                <input type="hidden" name="form-type" value="billing">
+                {% csrf_token %}
+                {{ billing_form.as_p }}
+                <input type="checkbox" name="copy-address"> Kopiraj ta naslov v seznam naslovov za dostavo</input>         
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submitt" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<br>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#billingModal">
+    Dodaj nov naslov za račun
+</button>
+
+<br>
+<br>
+<h3>Naslov za dostavo</h3>
+{% if object.usershippingaddress_set.count == 0 %}
+<p>Nimate naslova za dostavo. Dodaj nov naslov.</p>
+
+{% else %}
+{% for address in object.usershippingaddress_set.all %}
+<div class="radio">
+    <label><input type="radio" name="shipping-radio" value="{{ address.pk }}"> {{ address.name}} {{ address.surname}} - {{ address.street_name}} {{ address.street_nr}}, {{ address.zip_code}} {{ address.city}}</label>
+</div>
+
+
+{% endfor %}
+{% endif %}
+
+<!-- Modal -->
+<div class="modal fade" id="shippingModal" tabindex="-1" role="dialog" aria-labelledby="shippingModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            
+            <form action="{% url 'orders_address' %}" method="post">
+                <div class="modal-body">
+                <input type="hidden" name="form-type" value="shipping">
+                {% csrf_token %}
+                {{ shipping_form.as_p }}           
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submitt" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<br>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#shippingModal">
+    Dodaj nov naslov za dostavo
+</button>
+
+<br>
+<br>
+<h3>Način dostave</h3>
+{{ form.as_p }}
+<br>
+<br>
+<table class="table">
+    <tr>
+        <td colspan='6' class='text-right'>
+            <a class='btn btn-secondary' href="{% url 'cart' %}">Nazaj na košarico</a>
+            <a class='btn btn-warning' id ="next-step" href="#">Naprej na pregled naročila</a>
+        </td>
+    </tr>
+</table>
+
+{% endblock content %}
+
+{% block jquery %}
+$(".alert").hide()
+$("#next-step").click(function(){
+    var shipping = $("input[name=shipping-radio]:checked").val()
+    var billing = $("input[name=billing-radio]:checked").val()
+    var method = $("select[name=pickup_method]").val()
+    if (shipping && billing && method) {
+        url = "{% url 'orders_prepare' %}?ship_addr=" + shipping + "&bill_addr=" + billing + "&pickup=" + method
+        window.location.replace(url)
+    }
+    else {
+        $("#alert-msg").text("Izberi naslov za izdajo računa in dostavo.");
+        if (shipping) $("#alert-msg").text("Izberi naslov za izdajo računa.");
+        if (billing) $("#alert-msg").text("Izberi naslov za dostavo.");
+        if (!method) $("#alert-msg").text($("#alert-msg").text() + " Prav tako je potrebno izbrati način dostave.")
+        $(".alert").show()
+    }
+})
+
+{% endblock jquery %}

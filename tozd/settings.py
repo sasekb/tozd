@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'management',
     'products',
     'cart',
+    'orders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -137,3 +138,5 @@ LOGIN_URL = '/u/login'
 
 # Misc
 PRICE_ZABOJ = 4.0
+VAT_BRACKET_HIGH = 0.22
+VAT_BRACKET_LOW = 0.095

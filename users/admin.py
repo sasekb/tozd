@@ -2,7 +2,7 @@
 Adim for the users app
 """
 from django.contrib import admin
-from .models import User, Distributer
+from .models import User, Distributer, UserBillingAddress, UserShippingAddress
 from zaboj.models import Order
 
 class OrdersInline(admin.TabularInline):
@@ -55,6 +55,14 @@ class UserAdmin(admin.ModelAdmin):
     inlines = [OrdersInline]
     save_on_top = True
     save_as = True
+
+@admin.register(UserBillingAddress)
+class UserBillingAddressAdmin(admin.ModelAdmin):
+    model = UserBillingAddress
+
+@admin.register(UserShippingAddress)
+class UserShippingAddressAdmin(admin.ModelAdmin):
+    model = UserShippingAddress
 
 @admin.register(Distributer)
 class DistributerAdmin(admin.ModelAdmin):

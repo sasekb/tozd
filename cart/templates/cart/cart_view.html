@@ -13,10 +13,10 @@
 <div class='row main-content'>
     {% if cart.cartitem_set.count < 1 %}
     
-    {#% include "carts/empty_cart.html" %#}
+    <h2>Tvoja košarica je prazna. <a href="{% url 'product_list' %}">Nadaljuj z nakupom</a>.</h2>
     {% else %}
     
-    <div class='col-sm-8 col-sm-offset-2'>
+    <div class='col-sm-12 col-sm-offset-2'>
     
     <h2>Tvoja košarica:</h2>
     <table class='table'> 
@@ -24,6 +24,8 @@
             <td>Ime izdelka</td>
             <td>Količina</td>
             <td>Cena/kos</td>
+            <td>Cena brez DDV</td>
+            <td>DDV</td>
             <td>Cena</td>
             <td>Odstrani</td>
         </tr>
@@ -37,31 +39,46 @@
                 <input class="qty" type="number" name="qty" value="{{item.quantity }}" />
             </td>
             <td>{{ item.item.price }}€</td>
+            <td class="line-subtotal">{{ item.line_subtotal|floatformat:2 }}€</td>
+            <td class="line-tax-total">{{ item.line_tax_total|floatformat:2 }}€</td>
             <td class="line-total">{{ item.line_total|floatformat:2 }}€</td>
-            <td><a href="{% url 'cart' %}?item={{ item.item.id }}&rm=True"><i class="fa fa-times-circle" aria-hidden="true"></i></td>
+            <td><a href="{% url 'cart' %}?item={{ item.item.id }}&rm=True"><i class="far fa-times-circle"></i></td>
         </tr>
-        
+        {% if item.item.package_type %}
+        <tr id='pck-item-{{ item.item.id }}'>
+            <td><i class="fas fa-caret-right" style="margin-left:1em;"></i> Embalaža: {{ item.item.package_type.type }}</td>
+            <td class="pck-qty">{{item.quantity }}</td>
+            <td>{{ item.item.package_type.price }}€</td>
+            <td class="pck-subtotal">{{ item.line_package_subtotal|floatformat:2 }}€</td>
+            <td class="pck-tax-total">{{ item.line_package_tax_total|floatformat:2 }}€</td>
+            <td class="pck-total">{{ item.line_package_total|floatformat:2 }}€</td>
+        </tr>
+        {% endif %}
         {% endfor %}
-
+        
         <tr>
-            <td  colspan='5' class='text-right'>Nova in vrnjena embalaža bo obračunana v naslednjem koraku.</td>
+            <td  colspan='6' class='text-right'>Skupaj brez DDV: <span id='subtotal'>{{ cart.subtotal|floatformat:2 }}</span>€</td>
+        </tr>
+        
+        <tr>
+            <td colspan='6' class='text-right'>DDV: <span id='tax-total'>{{ cart.tax_total|floatformat:2 }}</span>€</td>
+        </tr>
+        
+        <tr>
+            <td colspan='6' class='text-right'>Skupaj: <span id='total'>{{ cart.total|floatformat:2 }}</span>€</td>
         </tr>
 
         <tr>
-            <td  colspan='5' class='text-right'>Skupaj brez DDV: <span id='subtotal'>{{ cart.subtotal|floatformat:2 }}</span>€</td>
+            <td  colspan='6' class='text-right'>Vrnjene embalaže: Ni še implementirano</td>
         </tr>
-        
+
         <tr>
-            <td colspan='5' class='text-right'>DDV: <span id='tax-total'>{{ cart.tax_total|floatformat:2 }}</span>€</td>
-        </tr>
-        
-        <tr>
-            <td colspan='5' class='text-right'>Skupaj: <span id='total'>{{ cart.total|floatformat:2 }}</span>€</td>
+            <td colspan='6' class='text-right'>Za plačilo: <span id='total'>{{ cart.total|floatformat:2 }}</span>€</td>
         </tr>
         
         
         <tr>
-            <td colspan='5' class='text-right'><a class='btn btn-warning' href="#">Na blagajno</a></td>
+            <td colspan='6' class='text-right'><a class='btn btn-warning' href="#">Na blagajno</a></td>
         </tr>
         
     </table>
@@ -92,12 +109,18 @@
                     $(".alert").show();
                     window.setTimeout(function () { 
                         $(".alert").hide("slow"); }, 2000);
+                    $("#item-" + response.item).find(".line-subtotal").text(response.lineSubtotal + "€")
+                    $("#item-" + response.item).find(".line-tax-total").text(response.lineTaxTotal + "€")
                     $("#item-" + response.item).find(".line-total").text(response.lineTotal + "€")
+                    $("#pck-item-" + response.item).find(".pck-qty").text(response.qty)
+                    $("#pck-item-" + response.item).find(".pck-subtotal").text(response.pckSubtotal + "€")
+                    $("#pck-item-" + response.item).find(".pck-tax-total").text(response.pckTaxTotal + "€")
+                    $("#pck-item-" + response.item).find(".pck-total").text(response.pckTotal + "€")
                     $("#total").text(response.total)
                     $("#tax-total").text(response.taxTotal)
                     $("#subtotal").text(response.subtotal)
                     $("#item-count").text(response.itemCount)
-                    $("#item-count").removeClass("invisible");y
+                    $("#item-count").removeClass("invisible");
                 },
                 error: function (response) {
                   alert(response.status);

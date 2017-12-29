@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^shop/', include('products.urls'), name='shop'),
     url(r'^cart/', include('cart.urls'), name='cart'),
+    url(r'^order/', include('orders.urls'), name='orders'),
     url(r'^u/', include('users.urls'), name='users'),
     url(r'^zaboj/', include('zaboj.urls'), name='zaboj'),
     url(r'^mng/', include('management.urls'), name='management'),

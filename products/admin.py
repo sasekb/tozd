@@ -6,9 +6,11 @@ from .models import Product, Variation, ProductImage
 
 class VariationInline(admin.TabularInline):
     model = Variation
+    extra = 0
 
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
+    extra = 0
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
