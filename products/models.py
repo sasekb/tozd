@@ -23,6 +23,27 @@ class ProductManager(models.Manager):
     def all(self):
         return self.get_queryset().active()
 
+class ProductOption(models.Model):
+    """
+    Options on a model, like "red", "250 g", etc.
+    """
+    display_name = models.CharField(max_length=120)
+    varbose_name = models.CharField(max_length=120)
+
+    def __str__(self):
+        return self.varbose_name
+
+class ProductOptionGroup(models.Model):
+    """
+    Option groups, like: "color", "size", etc.
+    """
+    display_name = models.CharField(max_length=120)
+    varbose_name = models.CharField(max_length=120)
+    options = models.ManyToManyField(ProductOption, db_constraint=False)
+
+    def __str__(self):
+        return self.varbose_name
+
 class Product(models.Model):
     """
     Model for products.
@@ -33,6 +54,7 @@ class Product(models.Model):
     tax_bracket = models.DecimalField(decimal_places=2, max_digits=4, default="22")
     active = models.BooleanField(default=True)
     package_type = models.ForeignKey(PackageType, on_delete=models.CASCADE, null=True, blank=True)
+    option_groups = models.ManyToManyField(ProductOptionGroup)
 
     objects = ProductManager()
 
@@ -49,6 +71,7 @@ class Variation(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     title = models.CharField(max_length=120)
     description = models.TextField(null=True, blank=True)
+    options = models.ManyToManyField(ProductOption)
     price = models.DecimalField(decimal_places=2, max_digits=8)
     tax_bracket = models.DecimalField(decimal_places=2, max_digits=4, default="22")
     active = models.BooleanField(default=True)
@@ -98,3 +121,10 @@ class ProductImage(models.Model):
     
     def __str__(self):
         return self.product.title
+
+class VariationImage(models.Model):
+    variation = models.ForeignKey(Variation, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to=image_upload_to)
+    
+    def __str__(self):
+        return self.variation.title

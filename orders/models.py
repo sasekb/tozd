@@ -10,6 +10,7 @@ class Order(models.Model):
     to_pay = models.DecimalField(decimal_places=2, max_digits=8)
     delivery_method = models.PositiveIntegerField()
     comment = models.TextField(blank=True, null=True)
+    payment_method = models.IntegerField(choices=((1, "Gotovina"), (2, "Predračun"), (3, "Predplačilo")), default=1)
     finalized = models.BooleanField(default=False)
     processed = models.BooleanField(default=False)
     shipped = models.BooleanField(default=False)

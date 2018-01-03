@@ -24,15 +24,20 @@
     <!-- Stranska vrstica - produkt -->
     <div class="col-4">
             {% if product.variation_set.count > 1 %}
-            <h3 id="price">{{ product.variation_set.first.price }}€</h3>
-            <select name="item" class="form-control" id="select-variation">
-                {% for variation in product.variation_set.all %}
-                <option value="{{variation.pk}}" data-price="{{variation.price}}">{{variation.title}}</option>
+            <h3 id="price">{{ product.price }}€</h3><span class="zaloga"></span><br>
+            {% for group in product.option_groups.all %}
+                <h4>{{ group.display_name }}</h4>
+                <select name="{{ group.display_name }}" class="form-control" id="select-variation-{{ group.pk }}">
+                <option value="">-----</option>
+                {% for option in group.options.all %}
+                    <option value="{{ option.pk }}">{{ option.display_name }}</option>
                 {% endfor %}
-            </select>
+                </select><br>
+            {% endfor %}
+            <input type="hidden" id="variation" value="">
             {% else %}
             <h3 id="price">{{ product.price }}€</h3>
-            <input type="hidden" id="select-variation" value="{{ product.variation_set.first.id }}"
+            <input type="hidden" id="variation" value="{{ product.variation_set.first.id }}">
             {% endif %}
             <br>
             <input class="form-control" type="number" value="1" id="qty" />
@@ -48,13 +53,31 @@
 
 {% block jquery %}
     $(".alert").hide()
-    $("#select-variation").change(function(){
-        var price = $("#select-variation option:selected").attr("data-price")
-        $("#price").text(price + "€")
+    $("[id^=select-variation]").change(function(){
+        var options=[]
+        $("[id^=select-variation]").each(function(){
+            if (this.value) options.push(this.value);
+        });
+        $.ajax({
+            type: "GET",
+            url: "?product={{ product.pk }}&options=" + options.toString(),
+            success: function (response) {
+                if (response.id) {
+                    $("#price").text(response.price + "€");
+                    $("#variation").val(response.id);
+                }
+            },
+            error: function (response) {
+              alert(response.status);
+            }
+        });
     });
     $("#add-cart").click(function(){
-        var item = $("#select-variation option:selected").val();
-        if (item == undefined) item = $("#select-variation").val();
+        var item = $("#variation").val();
+        if (item == "") {
+            alert("Izdelek ni na zalogi ali ne obstaja.")
+            return false;
+        }
         var qty = $("#qty").val();
         $.ajax({
             type: "GET",

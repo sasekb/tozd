@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block head_title %}Izbira načina plačila || {{ block.super }}{% endblock head_title %}
+
+
+{% block content %}
+<h1>Izberi način plačila:</h1><br>
+<div class="row">
+    <div class="col-sm-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Plačilo po prevzetju</h5>
+                <p class="card-text">Plačaš z gotovino distributerju ob prevzemu naročila.</p>
+                <a href="#" class="btn btn-primary">Izberi plačilo po prevzetju</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Plačilo po predračunu</h5>
+                <p class="card-text">Plačaj po predračunu preko spletne banke (UPN).</p>
+                <a href="#" class="btn btn-primary">Izberi plačilo po predračunu</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Naloži sredstva</h5>
+                <p class="card-text">Naloži sredstva vnaprej. Ob nakazilu min. 20€ ti pripada 10% bonus.</p>
+                <a href="#" class="btn btn-primary">Naloži sredstva in pridobi bonus</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

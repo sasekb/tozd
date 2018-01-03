@@ -14,6 +14,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url
+from django.views.generic import TemplateView
+from django.urls import path
 from .views import AddressDetailView, prepare_order, OrderDetailView
 
 
@@ -21,4 +23,5 @@ urlpatterns = [
     url(r'^address/$', AddressDetailView.as_view(), name='orders_address'),
     url(r'^prepare/$', prepare_order, name='orders_prepare'),
     url(r'^overview/(?P<pk>\d+)/$', OrderDetailView.as_view(), name='orders_overview'),
+    path('payment', TemplateView.as_view(template_name='orders/payment_choose.html'), name='orders_choose_payment'),
 ]
