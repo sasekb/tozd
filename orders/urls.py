@@ -23,5 +23,6 @@ urlpatterns = [
     url(r'^address/$', AddressDetailView.as_view(), name='orders_address'),
     url(r'^prepare/$', prepare_order, name='orders_prepare'),
     url(r'^overview/(?P<pk>\d+)/$', OrderDetailView.as_view(), name='orders_overview'),
-    path('payment', TemplateView.as_view(template_name='orders/payment_choose.html'), name='orders_choose_payment'),
+    path('payment/', TemplateView.as_view(template_name='orders/payment_choose.html'), name='orders_choose_payment'),
+    path('finalize/', TemplateView.as_view(template_name='orders/finalize.html'), name='orders_finalize'),
 ]

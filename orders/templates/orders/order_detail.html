@@ -5,6 +5,7 @@
 
 
 {% block content %}
+
 <div class='row main-content'>
     <div class="col-sm-6 col-sm-offset-2 border border-light rounded" style="padding:30px;">
         <h2>Naslov za izdajo računa</h2>
@@ -38,6 +39,13 @@
     </div>
 
     <div class='col-sm-12 col-sm-offset-2'>
+    <br>
+    <hr>
+    <h2>Opombe:</h2>
+    <div id="comment">{% if order.comment %} {{ order.comment|linebreaks }} {% endif %}</div><br>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+        Dodaj/popravi opombo
+    </button>
     <br>
     <hr>
     <h2>Pregled naročila</h2>
@@ -111,7 +119,44 @@
     </div>
     
     </div>
-    {% endblock %}
+      
+      <!-- Modal -->
+      <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Dodaj opombo</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form method="post" id="add-comment" action=".">{% csrf_token %}
+                <div class="modal-body">  
+                    <textarea name="comment" rows="5" style="width: 100%;" id="comment-txtbox">{% if order.comment %} {{ order.comment }} {% endif %}</textarea>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <input type="submit" class="btn btn-primary" value="Dodaj opombo">
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
+{% endblock %}
 
     {% block jquery %}
+    $( "#add-comment" ).submit(function( event ) {
+        event.preventDefault();
+        $.ajax({
+            data: $(this).serialize(),
+            type: $(this).attr('method'),
+            url: $(this).attr('action'),
+            success: function(response) {
+                comment = $("#comment-txtbox").val().replace(/\n/gi,'<br />');
+                $("#comment").empty().html(comment);
+                $('#exampleModal').modal('toggle');
+            }
+        });
+        return false;
+    });
     {% endblock %}

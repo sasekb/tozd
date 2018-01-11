@@ -1,4 +1,4 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, reverse, redirect
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
@@ -130,3 +130,10 @@ def prepare_order(request):
 
 class OrderDetailView(DetailView):
     model = Order
+
+    def post(self, request, *args, **kwargs):
+        comment = request.POST.get('comment')
+        order = self.get_object()
+        order.comment = comment
+        order.save()
+        return HttpResponse(status=200)
