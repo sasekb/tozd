@@ -13,6 +13,7 @@ from django.http import HttpResponse #, Http404, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView, FormView, CreateView
+from django.urls import reverse
 from zaboj.models import Vegetable
 from .forms import SignUpForm, UserPreferenceForm
 from .models import User
@@ -77,23 +78,39 @@ class UserEdit(LoginRequiredMixin, UpdateView):
         """ get object from model class """
         return get_object_or_404(User, id__iexact=self.request.user.id)
 
+class SignUpView(FormView):
+    model = User
+    form_class = SignUpForm
+    success_url = '/'
 
-def signup(request):
-    """
-    render the registration form
-    """
-    if request.method == 'POST':
-        form = SignUpForm(request.POST)
+    template_name = 'users/signup.html'
+
+    def form_valid(self, form):
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
-            login(request, user)
-            return redirect('/u/me')
-    else:
-        form = SignUpForm()
-    return render(request, 'users/signup.html', {'form': form})
+            login(self.request, user)
+        return super(SignUpView, self).form_valid( form)
+
+
+# def signup(request):
+#     """
+#     render the registration form
+#     """
+#     if request.method == 'POST':
+#         form = SignUpForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             username = form.cleaned_data.get('username')
+#             raw_password = form.cleaned_data.get('password1')
+#             user = authenticate(username=username, password=raw_password)
+#             login(request, user)
+#             return redirect('/u/me')
+#     else:
+#         form = SignUpForm()
+#     return render(request, 'users/signup.html', {'form': form})
 
 
 
