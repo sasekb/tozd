@@ -4,6 +4,9 @@
 
 
 {% block content %}
+{%for distributer in distributers %}
+{{distributer.user.address}}<br>
+{% endfor %}
 <div class="alert alert-danger" role="alert">
     <span id="alert-msg"></span>
 </div>
@@ -32,13 +35,13 @@
                 <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            
+
             <form action="{% url 'orders_address' %}" method="post">
                 <div class="modal-body">
                 <input type="hidden" name="form-type" value="billing">
                 {% csrf_token %}
                 {{ billing_form.as_p }}
-                <input type="checkbox" name="copy-address"> Kopiraj ta naslov v seznam naslovov za dostavo</input>         
+                <input type="checkbox" name="copy-address"> Kopiraj ta naslov v seznam naslovov za dostavo</input>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -79,12 +82,12 @@
                 <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            
+
             <form action="{% url 'orders_address' %}" method="post">
                 <div class="modal-body">
                 <input type="hidden" name="form-type" value="shipping">
                 {% csrf_token %}
-                {{ shipping_form.as_p }}           
+                {{ shipping_form.as_p }}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

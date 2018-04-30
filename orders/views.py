@@ -6,7 +6,7 @@ from django.views.generic.edit import FormView
 from cart.models import Cart, CartItem
 from products.models import Variation
 from .models import Order, OrderItem, OrderBillingAddress, OrderShippingAddress
-from users.models import User, UserBillingAddress, UserShippingAddress
+from users.models import User, UserBillingAddress, UserShippingAddress, Distributer
 from users.forms import UserBillingAddressForm, UserShippingAddressForm, UserPickupMethodForm
 
 class AddressDetailView(FormView, DetailView):
@@ -18,6 +18,7 @@ class AddressDetailView(FormView, DetailView):
         context = super(AddressDetailView, self).get_context_data(**kwargs)
         context['billing_form'] = UserBillingAddressForm()
         context['shipping_form'] = UserShippingAddressForm()
+        context['distributers'] = Distributer.objects.all()
         return context
 
     def post(self, request, *args, **kwargs):
@@ -35,7 +36,7 @@ class AddressDetailView(FormView, DetailView):
                 obj = form2.save(commit=False)
                 obj.user = request.user
                 obj.save()
-        return HttpResponseRedirect(self.request.path_info)  
+        return HttpResponseRedirect(self.request.path_info)
 
     def get_object(self):
         """ get object from model class """
@@ -57,15 +58,15 @@ def prepare_order(request):
     cart = Cart.objects.get_or_create(user=request.user, processed_to_order=False)[0]
     user_ship_addr = UserShippingAddress.objects.get_or_create(pk=shipping_address_id, user=request.user)[0]
     user_bill_addr = UserBillingAddress.objects.get_or_create(pk=billing_address_id, user=request.user)[0]
-    
+
     # dodaj strošek za dostavo na dom
     if pickup_method == "1":
         shipping = get_object_or_404(Variation, pk=6) # pk 6 - dostava (shipping)
         cart_item = CartItem.objects.get_or_create(cart=cart, item=shipping)[0]
         cart_item.quantity = 1
         cart_item.save()
-        
-    
+
+
     # Create order
     order = Order()
     order.user = request.user
@@ -100,7 +101,7 @@ def prepare_order(request):
         order_item.item_package_tax_total = item.line_package_tax_total
         order_item.item_package_total = item.line_package_total
         order_item.save()
-    
+
     # save the addresses
     shipping_address = OrderShippingAddress()
     shipping_address.order = order
