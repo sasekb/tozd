@@ -12,3 +12,5 @@ def item_count(request):
         return {'cart_items_count': cart.item_count,}
     except Cart.DoesNotExist:
         return {'cart_items_count': 0,}
+    except TypeError:
+        return {'cart_items_count': 0,}
