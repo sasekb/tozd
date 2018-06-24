@@ -1,8 +1,14 @@
+{% extends "base.html" %}
+
+{% block head_title %}Registracija uporabnika || {{ block.super }}{% endblock head_title %}
+
 {% block content %}
-<h2>Sign up</h2>
-<form method="post">
+{% load crispy_forms_tags %}
+
+<h2>Registracija uporabnika</h2>
+<form method="post" class="form-horizontal" role="form">
   {% csrf_token %}
-  {{form.as_p}}
-  <button type="submit">Sign up</button>
+  {{ form|crispy }}
+  <button type="submit">Ustvari račun</button>
 </form>
 {% endblock %}

@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-<a href="{% url 'login' %}">Login</a> or <a href="{% url 'signup' %}">Signup</a><br /><br />
+<a href="{% url 'login' %}">Login</a> or <a href="{% url 'users:signup' %}">Signup</a><br /><br />
 
-Oglej in uredi svoj <a href="{% url 'home' username='me' %}">profil</a><br /><br />
+Oglej in uredi svoj <a href="{% url 'users:home' username='me' %}">profil</a><br /><br />
 
 Oddaj <a href="{% url 'order' %}">naročilo</a>
 

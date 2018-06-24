@@ -45,7 +45,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+	'crispy_forms',
 ]
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -112,7 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'sl-si'
 
 TIME_ZONE = 'UTC'
 
@@ -134,9 +137,10 @@ MEDIA_URL = "/media/"
 SESSION_SAVE_EVERY_REQUEST = True
 AUTH_USER_MODEL = 'users.User'
 LOGIN_REDIRECT_URL = '/u/me'
-LOGIN_URL = '/u/login'
+LOGIN_URL = '/login'
 
 # Misc
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 PRICE_ZABOJ = 4.0
 VAT_BRACKET_HIGH = 0.22
 VAT_BRACKET_LOW = 0.095

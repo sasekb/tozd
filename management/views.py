@@ -6,8 +6,9 @@ from django.shortcuts import get_object_or_404
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 from tozd.settings import PRICE_ZABOJ
+from orders.models import Order
 from users.models import Distributer
-from zaboj.models import Order, Crate
+from zaboj.models import Crate
 from .forms import ProcessOrderForm, DeliverOrderForm
 from .models import ZabojProduction, ZabojDistribution
 

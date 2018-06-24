@@ -4,6 +4,7 @@ views for users app
 # from django.shortcuts import render
 #from django.http import HttpResponse
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.core.exceptions import PermissionDenied

@@ -53,8 +53,8 @@
                         </div>
                         <button type='submit' class='btn btn-default btn-block'>Login</button>
                     </form>
-                    <p class='text-center'>Nov uporabnik? <a href='#'>Registriraj se</a>!</p>
-                    <p class='text-center'><a href='#'>Forgot password</a>?</p>
+                    <p class='text-center'>Nov uporabnik? <a href='{% url "users:signup" %}'>Registriraj se</a>!</p>
+                    <p class='text-center'><a href='{% url 'password_reset' %}'>Pozabljeno geslo?</a></p>
                 </div>
                 {% endif %}
                 </li>

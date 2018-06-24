@@ -1,28 +1,28 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% load crispy_forms_tags %}
 
 {% if form.errors %}
-<p>Your username and password didn't match. Please try again.</p>
+<p>Uporabniško ime in geslo se ne ujemata.</p>
 {% endif %}
 
 {% if next %}
     {% if user.is_authenticated %}
-    <p>Your account doesn't have access to this page. To proceed,
-    please login with an account that has access.</p>
+    <p>Uporabniški račun nima pravic za ogled te strani. Prijavite se z drugim uporabniškim računom.</p>
     {% else %}
-    <p>Please login to see this page.</p>
+    <p>Prijavite se za ogled vsebine.</p>
     {% endif %}
 {% endif %}
 
 <form method="post" action="{% url 'login' %}">
 {% csrf_token %}
-{{ form.as_p }}
+{{ form|crispy }}
 
-<input type="submit" value="login" />
+<input type="submit" value="Prijava" />
 <input type="hidden" name="next" value="{{ next }}" />
 </form>
 
-{# Assumes you setup the password_reset view in your URLconf #}
+<p>Ste pozabili uporabniško ime ali geslo? Kliknite <a href='{% url 'password_reset' %}'>tukaj</a>.</p>
 
 {% endblock %}

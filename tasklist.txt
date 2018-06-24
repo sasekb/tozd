@@ -1,7 +1,7 @@
 ﻿TASKLIST:
 
 Benjamin:
-- Login, SignUp view in html videz [];
+- Login, SignUp view in html videz [x];
 - /shop/ videz [];
 - /order/address/ izbriši naslov in način dostave, dodaj zemljevid distributerjev in možnost izbire,
 	potem ga zapiše na order in shrani v bazo (na modelu dodaj field distributer in ga tja zapiši) [];
@@ -9,5 +9,8 @@ Benjamin:
 - finalize order -> izpiši zahvalo in shrani vse v database [].
 
 Blaž:
-- vzpostavi distribucijsko okolje [];
+- vzpostavi distribucijsko okolje [x];
 - naredi management view-je [].
+
+Extra: 
+- dodal password reset [B]
