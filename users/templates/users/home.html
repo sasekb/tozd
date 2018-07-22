@@ -2,40 +2,12 @@
 
 {% block content %}
     <h1>{{ user.first_name }} {{ user.last_name }}</h1>
-    <h3>Podatki    <span style="font-size: 12px;"><a href="{% url 'edit' %}">Uredi podatke</a></span></h3>
+    <h3>Podatki    <span style="font-size: 12px;"><a href="{% url 'users:edit' %}">Uredi podatke</a></span></h3>
     Uporabniško ime: <span>{{ user.username }}</span><br />
     Naslov: <span>{{ user.address }}</span><br />
     Mesto: <span>{{ user.city }}</span><br />
     Četrtna skupnost: <span>{{ user.district }}</span><br />
     Telefonska št.: <span>{{ user.phone_nr }}</span><br />
-    Način dostave: <span>{{ user.get_pickup_method_display }}</span><br />
 
     <hr>
-    <h3>Naročila  <span style="font-size: 12px;"><a href="{% url 'order' %}">Oddaj novo naročilo</a></span></h3>
-    {% for order in user.order_set.all|dictsortreversed:'created' %}
-        <span>{{ order.quantity }}kg naročeno na dan {{ order.pretty_date }}</span><br />
-    {% endfor %}
-
-    <hr>
-    <h3>Preference  <span style="font-size: 12px;"><a href="{% url 'preferences' %}">Uredi preference</a></span></h3>
-    Likes:
-    <ul>
-    {% for like in likes %}
-        <li>{{ like.name }}</li>
-    {% endfor %}<br />
-    </ul>
-    Dislikes:
-    <ul>
-    {% for dislike in dislikes %}
-        <li>{{ dislike.name }}</li>
-    {% endfor %}<br />
-    </ul>
-    {% if remaining_veggies %}
-        Preferenca ni vpisana:
-        <ul>
-        {% for veggie in remaining_veggies %}
-            <li>{{ veggie }}</li>
-        {%endfor%}
-        </ul>
-    {% endif %}
 {% endblock %}

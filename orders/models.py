@@ -1,5 +1,7 @@
 from django.db import models
 from tozd.settings import AUTH_USER_MODEL as User
+from users.models import Distributer
+
 
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
@@ -10,7 +12,8 @@ class Order(models.Model):
     to_pay = models.DecimalField(decimal_places=2, max_digits=8)
     delivery_method = models.PositiveIntegerField()
     comment = models.TextField(blank=True, null=True)
-    payment_method = models.IntegerField(choices=((1, "Gotovina"), (2, "Predračun"), (3, "Predplačilo")), default=1)
+    payment_method = models.IntegerField(choices=((1, "Gotovina"), (2, "Predračun"), (3, "Predplačilo")), default=2)
+    distributer = models.ForeignKey(Distributer, on_delete=models.SET_NULL, null=True)
     finalized = models.BooleanField(default=False)
     processed = models.BooleanField(default=False)
     shipped = models.BooleanField(default=False)
@@ -21,6 +24,7 @@ class Order(models.Model):
 
     def __str__(self):
         return f'{self.user} ({self.created})'
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
@@ -41,6 +45,7 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f'{self.order}: {self.item_name}'
+
 
 class OrderBillingAddress(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)

@@ -16,7 +16,7 @@ Including another URLconf
 from django.conf.urls import url
 from django.views.generic import TemplateView
 from django.urls import path
-from .views import AddressDetailView, prepare_order, OrderDetailView
+from .views import AddressDetailView, prepare_order, OrderDetailView, OrderFinalizeView
 
 
 urlpatterns = [
@@ -24,5 +24,5 @@ urlpatterns = [
     url(r'^prepare/$', prepare_order, name='orders_prepare'),
     url(r'^overview/(?P<pk>\d+)/$', OrderDetailView.as_view(), name='orders_overview'),
     path('payment/', TemplateView.as_view(template_name='orders/payment_choose.html'), name='orders_choose_payment'),
-    path('finalize/', TemplateView.as_view(template_name='orders/finalize.html'), name='orders_finalize'),
+    path('finalize/', OrderFinalizeView.as_view(), name='orders_finalize'),
 ]

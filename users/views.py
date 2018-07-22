@@ -72,7 +72,7 @@ class UserEdit(LoginRequiredMixin, UpdateView):
     Edit basic information about user
     """
     model = User
-    fields = ['first_name', 'last_name', 'address', 'city', 'district', 'phone_nr', 'pickup_method']
+    fields = ['first_name', 'last_name', 'address', 'city', 'district', 'phone_nr']
     template_name_suffix = '_update_form'
 
     def get_object(self):

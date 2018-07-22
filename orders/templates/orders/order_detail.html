@@ -26,16 +26,9 @@
         {% endfor %}
     </div>
     <div class="col-sm-6 col-sm-offset-2 border border-light rounded" style="padding:30px;">
-        <h2>Naslov za dostavo</h2>
-        {% for addr in order.ordershippingaddress_set.all %}
-            {% if addr.vat_nr %}
-            <strong>{{ addr.company_name }} </strong><br>
-            {% endif %}
-            <strong>{{ addr.name }} {{ addr.surname }}</strong><br>
-            {{ addr.street_name }} {{ addr.street_nr }} <br>
-            {{ addr.zip_code }} {{ addr.city }} <br>
-            {{ addr.country }} <br>      
-        {% endfor %}
+        <h2>Naslov za prevzem</h2>
+        {{ order.distributer.user.address }}  {% if order.distributer.user.district %} ({{ order.distributer.user.district }}) {% endif %}<br>
+        {{ order.distributer.user.city }}
     </div>
 
     <div class='col-sm-12 col-sm-offset-2'>
@@ -98,12 +91,12 @@
 
         <tr>
             <td  colspan='5' class='text-right'>Vrnjene embalaže</td>
-            <td>{{ order.discount_for_returned_package|floatformat:2 }}€</td>
+            <td>Obračunano naknadno {# order.discount_for_returned_package|floatformat:2 #}</td>
         </tr>
 
         <tr>
             <td colspan='5' class='text-right'>Za plačilo</td>
-            <td>{{ order.to_pay|floatformat:2 }}€</td>
+            <td>Obračunano naknadno {# order.to_pay|floatformat:2 #}</td>
         </tr>
         
         

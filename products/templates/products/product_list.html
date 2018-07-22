@@ -4,14 +4,18 @@
 
 
 {% block content %}
-
-<table class='table'>
-    
-    
+<div class="card-columns">
     {% for product in product_list %}
-    <tr><td><a href="{{ product.get_absolute_url }}">{{ product.title }}</a></td></tr>
+    <a href="{{ product.get_absolute_url }}" style="text-decoration: none; color:black;">
+        <div class="card">
+            <img class="card-img-top" src="{{ product.productimage_set.first.image.url }}" alt="Card image cap">
+            <div class="card-body">
+                <h5 class="card-title">{{ product.title }}</h5>
+                <p class="card-text">{{ product.description|truncatechars:150 }}</p>
+            </div>
+        </div>
+    </a>
     {% endfor %}
-    
-</table>
+</div>
 
 {% endblock %}

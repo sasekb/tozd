@@ -1,5 +1,6 @@
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404, reverse, redirect
+from django.views.generic import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 
@@ -50,26 +51,19 @@ class AddressDetailView(FormView, DetailView):
 def prepare_order(request):
     """
     Prepare the order and return the overview page to confirm order.
-    Request looks like: ?ship_addr=2&bill_addr=1&pickup=1
+    Request looks like: ?distributer=2&bill_addr=1
     """
-    shipping_address_id = request.GET.get('ship_addr')
+    distributer_id = request.GET.get('distributer')
     billing_address_id = request.GET.get('bill_addr')
-    pickup_method = request.GET.get('pickup')
+    pickup_method = 2 # this is left in place if we ever decide to have door-to-door deliveries - otherwise it should be deleted
     cart = Cart.objects.get_or_create(user=request.user, processed_to_order=False)[0]
-    user_ship_addr = UserShippingAddress.objects.get_or_create(pk=shipping_address_id, user=request.user)[0]
     user_bill_addr = UserBillingAddress.objects.get_or_create(pk=billing_address_id, user=request.user)[0]
-
-    # dodaj strošek za dostavo na dom
-    if pickup_method == "1":
-        shipping = get_object_or_404(Variation, pk=6) # pk 6 - dostava (shipping)
-        cart_item = CartItem.objects.get_or_create(cart=cart, item=shipping)[0]
-        cart_item.quantity = 1
-        cart_item.save()
-
+    distributer = Distributer.objects.get(pk=distributer_id)
 
     # Create order
     order = Order()
     order.user = request.user
+    order.distributer = distributer
     order.subtotal = cart.subtotal
     order.tax_total = cart.tax_total
     order.total = cart.total
@@ -102,18 +96,6 @@ def prepare_order(request):
         order_item.item_package_total = item.line_package_total
         order_item.save()
 
-    # save the addresses
-    shipping_address = OrderShippingAddress()
-    shipping_address.order = order
-    shipping_address.name = user_ship_addr.name
-    shipping_address.surname = user_ship_addr.surname
-    shipping_address.street_name = user_ship_addr.street_name
-    shipping_address.street_nr = user_ship_addr.street_nr
-    shipping_address.zip_code = user_ship_addr.zip_code
-    shipping_address.city = user_ship_addr.city
-    shipping_address.country = user_ship_addr.country
-    shipping_address.save()
-
     billing_address = OrderBillingAddress()
     billing_address.order = order
     billing_address.name = user_bill_addr.name
@@ -138,3 +120,19 @@ class OrderDetailView(DetailView):
         order.comment = comment
         order.save()
         return HttpResponse(status=200)
+
+
+class OrderFinalizeView(TemplateView):
+    template_name = 'orders/finalze.html'
+
+    def get(self, request, *args, **kwargs):
+        payment_method = request.GET.get('method')
+        order = Order.objects.filter(user=request.user).last()
+        print(order)
+        order.payment_method = payment_method
+        order.save()
+
+        cart = Cart.objects.get(processed_to_order=False, user=request.user)
+        cart.processed_to_order = True
+        cart.save()
+        return super(OrderFinalizeView, self).get(request, *args, **kwargs)

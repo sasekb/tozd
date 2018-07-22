@@ -4,24 +4,39 @@
 
 
 {% block content %}
-{%for distributer in distributers %}
-{{distributer.user.address}}<br>
-{% endfor %}
+{% load crispy_forms_tags %}
+
 <div class="alert alert-danger" role="alert">
-    <span id="alert-msg"></span>
-</div>
+        <span id="alert-msg"></span>
+    </div>
+
+<h3>Izberi prevzemno mesto</h3>
+
+{%for distributer in distributers %}
+<div class="radio">
+    <label>
+        <input type="radio" name="distributer-radio" value="{{ distributer.pk }}">
+        {{distributer.user.address}} {% if distributer.user.district %} ({{ distributer.user.district }}) {% endif %}, {{distributer.user.city}}
+    </label>
+    </div>
+{% endfor %}
+<br>
 
 <h3>Naslov za račun</h3>
 {% if object.userbillingaddress_set.count == 0 %}
-<p>Nimate naslova za dostavo. Dodaj nov naslov.</p>
+<p>Nimate naslova za izdajo računa. Dodaj nov naslov.</p>
 
 {% else %}
 {% for address in object.userbillingaddress_set.all %}
 <div class="radio">
-    <label><input type="radio" name="billing-radio" value="{{ address.pk }}"> {{ address.name}} {{ address.surname}} - {{ address.street_name}} {{ address.street_nr}}, {{ address.zip_code}} {{ address.city}} (Davčni zavezanec: {{ address.vat_taxpayer}}, davčna: {{ address.vat_nr }} )</label>
+    <label>
+        <input type="radio" name="billing-radio" value="{{ address.pk }}"> {{ address.name}} {{ address.surname}} - 
+        {{ address.street_name}} {{ address.street_nr}}, {{ address.zip_code}} {{ address.city}} 
+        {% if address.vat_nr %}
+        (Davčni zavezanec: {% if address.vat_taxpayer %} Da {% else %} Ne {% endif %}, davčna: {{ address.vat_nr }} )
+        {% endif %}
+    </label>
 </div>
-
-
 {% endfor %}
 {% endif %}
 
@@ -30,7 +45,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Dodaj naslov za izdajo računa</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
                 </button>
@@ -40,12 +55,11 @@
                 <div class="modal-body">
                 <input type="hidden" name="form-type" value="billing">
                 {% csrf_token %}
-                {{ billing_form.as_p }}
-                <input type="checkbox" name="copy-address"> Kopiraj ta naslov v seznam naslovov za dostavo</input>
+                {{ billing_form|crispy }}
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submitt" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Zapri</button>
+                    <button type="submitt" class="btn btn-primary">Shrani spremembe</button>
                 </div>
             </form>
         </div>
@@ -56,56 +70,6 @@
     Dodaj nov naslov za račun
 </button>
 
-<br>
-<br>
-<h3>Naslov za dostavo</h3>
-{% if object.usershippingaddress_set.count == 0 %}
-<p>Nimate naslova za dostavo. Dodaj nov naslov.</p>
-
-{% else %}
-{% for address in object.usershippingaddress_set.all %}
-<div class="radio">
-    <label><input type="radio" name="shipping-radio" value="{{ address.pk }}"> {{ address.name}} {{ address.surname}} - {{ address.street_name}} {{ address.street_nr}}, {{ address.zip_code}} {{ address.city}}</label>
-</div>
-
-
-{% endfor %}
-{% endif %}
-
-<!-- Modal -->
-<div class="modal fade" id="shippingModal" tabindex="-1" role="dialog" aria-labelledby="shippingModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
-            <form action="{% url 'orders_address' %}" method="post">
-                <div class="modal-body">
-                <input type="hidden" name="form-type" value="shipping">
-                {% csrf_token %}
-                {{ shipping_form.as_p }}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submitt" class="btn btn-primary">Save changes</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-<br>
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#shippingModal">
-    Dodaj nov naslov za dostavo
-</button>
-
-<br>
-<br>
-<h3>Način dostave</h3>
-{{ form.as_p }}
 <br>
 <br>
 <table class="table">
@@ -120,20 +84,19 @@
 {% endblock content %}
 
 {% block jquery %}
-$(".alert").hide()
+$(".alert").hide();
 $("#next-step").click(function(){
-    var shipping = $("input[name=shipping-radio]:checked").val()
+    var distributer = $("input[name=distributer-radio]:checked").val()
+    console.log(distributer)
     var billing = $("input[name=billing-radio]:checked").val()
-    var method = $("select[name=pickup_method]").val()
-    if (shipping && billing && method) {
-        url = "{% url 'orders_prepare' %}?ship_addr=" + shipping + "&bill_addr=" + billing + "&pickup=" + method
+    if (distributer && billing) {
+        url = "{% url 'orders_prepare' %}?distributer=" + distributer + "&bill_addr=" + billing
         window.location.replace(url)
     }
     else {
-        $("#alert-msg").text("Izberi naslov za izdajo računa in dostavo.");
-        if (shipping) $("#alert-msg").text("Izberi naslov za izdajo računa.");
-        if (billing) $("#alert-msg").text("Izberi naslov za dostavo.");
-        if (!method) $("#alert-msg").text($("#alert-msg").text() + " Prav tako je potrebno izbrati način dostave.")
+        $("#alert-msg").text("Izberi naslov za prevzem in izdajo računa.");
+        if (distributer) $("#alert-msg").text("Izberi naslov za izdajo računa.");
+        if (billing) $("#alert-msg").text("Izberi naslov za prevzem.");
         $(".alert").show()
     }
 })
